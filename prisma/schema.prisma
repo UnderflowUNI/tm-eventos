@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Datas marcadas pela dona (ocupado ou em análise)
+model BlockedDate {
+  id           String   @id @default(cuid())
+  date         DateTime @unique @db.Date
+  status       String   @default("OCCUPIED") // OCCUPIED | PENDING | UNAVAILABLE
+  label        String?  // rótulo livre, ex: "Casamento João e Maria"
+  eventType    String?  // categoria opcional, ex: "Almoço com churrasco"
+  clientName   String?
+  note         String?
+  gcalEventId  String?  // id do evento no Google Calendar (pra sincronizar/deletar)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Solicitações de orçamento enviadas pelo formulário
+model Booking {
+  id            String   @id @default(cuid())
+  clientName    String
+  whatsapp      String
+  email         String?
+  bookingType   String   @default("VENUE") // VENUE (aluguel do espaço) | TABLE (mesa pesque-pague)
+  eventDate     DateTime @db.Date            // dia (ou início do range)
+  eventEndDate  DateTime? @db.Date           // fim do range (só pra VENUE multi-dia)
+  guests        Int
+  eventType     String?  // ex: "ALMOCO_CHURRASCO" (só pra VENUE)
+  selections    Json     // JSON dos itens do cardápio (vazio pra TABLE)
+  totalEstimate Float
+  message       String?
+  status        String   @default("NEW") // NEW | CONTACTED | CONFIRMED | REJECTED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}

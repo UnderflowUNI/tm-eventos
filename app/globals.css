@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tipografia: Fraunces (display serif, expressiva) + Manrope (sans, refinada) */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Manrope:wght@300;400;500;600;700;800&display=swap");
+
+:root {
+  --ink-900: #0a0807;
+  --ink-800: #141110;
+  --ink-700: #1f1a18;
+  --wood-300: #b8854f;
+  --accent: #5eead4;
+  --accent-deep: #0f766e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--ink-900);
+  color: #f1ebe5;
+  font-family: "Manrope", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink-900);
+}
+
+/* Scrollbar tematizada */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ink-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-700);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--wood-300);
+}
+
+/* Linha decorativa diagonal usada nas seções */
+.hairline {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(94, 234, 212, 0.45),
+    transparent
+  );
+  height: 1px;
+}
+
+/* Glow para destaques */
+.text-accent-glow {
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(94, 234, 212, 0.35);
+}
+
+/* Botão com brilho deslizante */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.7s;
+}
+.btn-shine:hover::before {
+  transform: translateX(100%);
+}
+
+/* Grão sutil para dar textura aos backgrounds */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' /></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: 0.05;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Wood pattern decorativo */
+.wood-pattern {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(184, 133, 79, 0.03) 0,
+    rgba(184, 133, 79, 0.03) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+/* Calendario - células */
+.cal-cell {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cal-cell:hover:not(:disabled) {
+  transform: translateY(-2px);
+}

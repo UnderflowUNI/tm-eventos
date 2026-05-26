@@ -1,0 +1,17 @@
+node_modules
+.next
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vercel
+/build
+/dist
+
+# Credenciais — NUNCA commitar
+tm-eventos-*.json
+*-iam-serviceaccount*.json
+service-account*.json
+*.pem
+*.key
