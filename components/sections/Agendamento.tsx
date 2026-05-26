@@ -6,7 +6,7 @@ export function Agendamento() {
   return (
     <section
       id="agendamento"
-      className="relative py-32 bg-ink-800 overflow-hidden"
+      className="relative py-20 sm:py-28 lg:py-32 bg-ink-800 overflow-hidden"
     >
       <div
         className="absolute inset-0 opacity-20"
@@ -18,23 +18,23 @@ export function Agendamento() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-ink-900 via-ink-900/95 to-ink-900/70" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.35em] text-accent/80 mb-6 flex items-center gap-3">
-            <span className="w-12 h-px bg-accent/60" />
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] sm:tracking-[0.35em] text-accent/80 mb-5 sm:mb-6 flex items-center gap-3">
+            <span className="w-8 sm:w-12 h-px bg-accent/60" />
             Agendamento
           </div>
-          <h2 className="font-display font-light text-5xl lg:text-6xl leading-[1.05] tracking-tight">
+          <h2 className="font-display font-light text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight">
             Agende seu{" "}
             <span className="italic text-accent-glow">evento.</span>
           </h2>
-          <p className="mt-6 text-white/70 leading-relaxed max-w-lg">
+          <p className="mt-5 sm:mt-6 text-white/70 leading-relaxed max-w-lg text-sm sm:text-base">
             Veja as datas disponíveis no calendário ao lado. Escolha o tipo de
             evento, monte seu cardápio e receba uma estimativa instantânea —
             depois é só enviar para nós via WhatsApp.
           </p>
 
-          <ul className="mt-10 space-y-4">
+          <ul className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
             <Feature
               icon={<Calendar size={18} />}
               text="Calendário sempre atualizado pela proprietária"
@@ -55,9 +55,9 @@ export function Agendamento() {
 
           <Link
             href="/agendamento"
-            className="btn-shine mt-10 inline-flex items-center gap-3 px-7 py-4 bg-accent text-ink-900 font-semibold rounded-md hover:bg-accent-glow transition"
+            className="btn-shine mt-8 sm:mt-10 inline-flex items-center gap-3 px-6 sm:px-7 py-3.5 sm:py-4 bg-accent text-ink-900 font-semibold rounded-md hover:bg-accent-glow transition text-sm sm:text-base"
           >
-            <Calendar size={18} />
+            <Calendar size={17} />
             Solicitar orçamento agora
           </Link>
         </div>

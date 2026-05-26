@@ -73,17 +73,17 @@ export function Hero() {
       <div className="absolute top-1/3 left-0 right-0 hairline" />
       <div className="absolute bottom-1/4 left-0 right-0 hairline opacity-30" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 pt-44 pb-32 min-h-screen flex flex-col justify-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pt-28 sm:pt-36 lg:pt-44 pb-20 sm:pb-28 lg:pb-32 min-h-screen flex flex-col justify-center">
         <div
-          className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.35em] text-accent/80 mb-8 opacity-0 animate-fade-up"
+          className="inline-flex items-center gap-3 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] sm:tracking-[0.35em] text-accent/80 mb-6 sm:mb-8 opacity-0 animate-fade-up"
           style={{ animationDelay: "0.2s" }}
         >
-          <span className="w-12 h-px bg-accent/60" />
+          <span className="w-8 sm:w-12 h-px bg-accent/60" />
           Canaã — MG · Desde sempre
         </div>
 
         <h1
-          className="font-display font-light text-6xl sm:text-7xl lg:text-[8.5rem] leading-[0.95] tracking-tight max-w-4xl opacity-0 animate-fade-up"
+          className="font-display font-light text-5xl sm:text-7xl lg:text-[8.5rem] leading-[0.95] tracking-tight max-w-4xl opacity-0 animate-fade-up"
           style={{ animationDelay: "0.4s" }}
         >
           Seu evento
@@ -94,7 +94,7 @@ export function Hero() {
         </h1>
 
         <p
-          className="mt-10 max-w-xl text-lg text-white/70 leading-relaxed opacity-0 animate-fade-up"
+          className="mt-6 sm:mt-10 max-w-xl text-base sm:text-lg text-white/70 leading-relaxed opacity-0 animate-fade-up"
           style={{ animationDelay: "0.6s" }}
         >
           Estrutura completa para casamentos, formaturas, aniversários e eventos
@@ -102,31 +102,31 @@ export function Hero() {
         </p>
 
         <div
-          className="mt-12 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
+          className="mt-8 sm:mt-12 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 opacity-0 animate-fade-up"
           style={{ animationDelay: "0.8s" }}
         >
           <Link
             href="/agendamento"
-            className="btn-shine inline-flex items-center gap-3 px-7 py-4 bg-accent text-ink-900 font-semibold rounded-md hover:bg-accent-glow transition group"
+            className="btn-shine inline-flex items-center justify-center gap-3 px-6 sm:px-7 py-3.5 sm:py-4 bg-accent text-ink-900 font-semibold rounded-md hover:bg-accent-glow transition group text-sm sm:text-base"
           >
-            <Calendar size={18} />
+            <Calendar size={17} />
             Agendar visita
             <ArrowRight
-              size={18}
+              size={17}
               className="group-hover:translate-x-1 transition-transform"
             />
           </Link>
           <a
             href="#galeria"
-            className="inline-flex items-center gap-3 px-7 py-4 border border-white/15 hover:border-white/40 rounded-md transition backdrop-blur-sm bg-ink-900/20"
+            className="inline-flex items-center justify-center gap-3 px-6 sm:px-7 py-3.5 sm:py-4 border border-white/15 hover:border-white/40 rounded-md transition backdrop-blur-sm bg-ink-900/20 text-sm sm:text-base"
           >
-            <Play size={16} className="text-accent" />
+            <Play size={15} className="text-accent" />
             Conhecer o espaço
           </a>
         </div>
 
         {/* Indicador de slide ativo */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2">
           {HERO_SLIDES.map((_, i) => (
             <button
               key={i}
@@ -134,21 +134,21 @@ export function Hero() {
               onClick={() => setActive(i)}
               className={`h-px transition-all duration-500 ${
                 active === i
-                  ? "w-12 bg-accent"
-                  : "w-6 bg-white/30 hover:bg-white/60"
+                  ? "w-10 sm:w-12 bg-accent"
+                  : "w-5 sm:w-6 bg-white/30 hover:bg-white/60"
               }`}
             />
           ))}
         </div>
 
         {/* Indicador de scroll */}
-        <div className="absolute bottom-10 left-6 lg:left-10 hidden md:flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-white/40 animate-float">
+        <div className="absolute bottom-8 sm:bottom-10 left-4 sm:left-6 lg:left-10 hidden md:flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-white/40 animate-float">
           <span className="w-px h-12 bg-white/30" />
           <span>Role para descobrir</span>
         </div>
 
         {/* Ornamento canto direito */}
-        <div className="absolute bottom-10 right-6 lg:right-10 hidden md:block text-right text-[10px] uppercase tracking-[0.3em] text-white/30">
+        <div className="absolute bottom-8 sm:bottom-10 right-4 sm:right-6 lg:right-10 hidden md:block text-right text-[10px] uppercase tracking-[0.3em] text-white/30">
           <div className="font-display text-3xl text-accent/80 mb-1 normal-case tracking-normal italic">
             est. 2018
           </div>

@@ -9,12 +9,12 @@ export function Footer() {
     >
       <div className="absolute inset-0 wood-pattern opacity-30" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-20">
-        <div className="grid lg:grid-cols-4 gap-12">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-14 sm:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 lg:gap-12">
           {/* Logo + Tagline */}
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="relative w-14 h-14">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-3 mb-5 sm:mb-6">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14">
                 <Image
                   src="/brand/logo-tm.png"
                   alt="TM Salão de Eventos"
@@ -23,7 +23,7 @@ export function Footer() {
                 />
               </div>
               <div>
-                <div className="font-display text-lg leading-none">
+                <div className="font-display text-base sm:text-lg leading-none">
                   TM <span className="italic text-accent/80 font-normal">Eventos</span>
                 </div>
                 <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
@@ -31,13 +31,13 @@ export function Footer() {
                 </div>
               </div>
             </div>
-            <p className="text-sm text-white/50 leading-relaxed">
+            <p className="text-sm text-white/50 leading-relaxed max-w-xs">
               Seu evento começa aqui. Estrutura completa para momentos únicos em
               Canaã — MG.
             </p>
             <a
               href="/agendamento"
-              className="mt-6 inline-flex items-center gap-2 px-5 py-3 border border-white/15 hover:border-accent hover:text-accent rounded-md transition text-sm"
+              className="mt-5 sm:mt-6 inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 border border-white/15 hover:border-accent hover:text-accent rounded-md transition text-sm"
             >
               Agendar visita →
             </a>
@@ -50,14 +50,14 @@ export function Footer() {
             </div>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <Phone size={14} className="mt-1 text-accent" />
+                <Phone size={14} className="mt-1 text-accent shrink-0" />
                 <div>
                   <div>(31) 98467-2190</div>
                   <div className="text-white/50">(31) 98257-4543</div>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <Mail size={14} className="mt-1 text-accent" />
+                <Mail size={14} className="mt-1 text-accent shrink-0" />
                 <a
                   href="mailto:teixeiramachado43@gmail.com"
                   className="hover:text-accent transition break-all"
@@ -66,7 +66,7 @@ export function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin size={14} className="mt-1 text-accent" />
+                <MapPin size={14} className="mt-1 text-accent shrink-0" />
                 <span>Canaã — MG</span>
               </li>
             </ul>
@@ -79,7 +79,7 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-sm text-white/70">
               <li className="flex items-center gap-3">
-                <Clock size={14} className="text-accent" />
+                <Clock size={14} className="text-accent shrink-0" />
                 Atendimento por agendamento
               </li>
               <li>Seg — Dom · 8h às 20h</li>
@@ -102,14 +102,14 @@ export function Footer() {
             >
               <Instagram size={16} />@teixeiramachado_
             </a>
-            <div className="mt-8 text-xs text-white/40 leading-relaxed">
+            <div className="mt-6 sm:mt-8 text-xs text-white/40 leading-relaxed">
               <div className="font-mono">CNPJ 60.307.144/0001-17</div>
               <div className="mt-1 italic">João Pedro Teixeira Machado</div>
             </div>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-white/40">
+        <div className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 text-xs text-white/40">
           <div>
             © {new Date().getFullYear()} Espaço Teixeira Machado. Todos os
             direitos reservados.

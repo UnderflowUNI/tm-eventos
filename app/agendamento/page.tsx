@@ -182,12 +182,12 @@ export default function AgendamentoPage() {
   return (
     <div className="min-h-screen bg-ink-900 text-white wood-pattern">
       <header className="border-b border-white/5 bg-ink-900/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 text-white/70 hover:text-white">
-            <ArrowLeft size={18} /> Voltar
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 text-white/70 hover:text-white text-sm sm:text-base">
+            <ArrowLeft size={16} /> Voltar
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 border border-accent/60 rounded-md grid place-items-center font-display text-accent">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 border border-accent/60 rounded-md grid place-items-center font-display text-accent text-sm">
               TM
             </div>
             <span className="hidden sm:inline text-sm">Espaço Teixeira Machado</span>
@@ -195,23 +195,23 @@ export default function AgendamentoPage() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 lg:px-10 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         {/* Stepper */}
-        <div className="flex items-center justify-center gap-2 sm:gap-4 mb-12">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
             <div key={s} className="flex items-center gap-2 sm:gap-4">
               <div
-                className={`w-10 h-10 grid place-items-center rounded-full text-sm font-bold transition ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 grid place-items-center rounded-full text-xs sm:text-sm font-bold transition ${
                   currentVisualStep >= s
                     ? "bg-accent text-ink-900"
                     : "bg-ink-700 text-white/40 border border-white/10"
                 }`}
               >
-                {currentVisualStep > s ? <Check size={16} /> : s}
+                {currentVisualStep > s ? <Check size={14} /> : s}
               </div>
               {s < totalSteps && (
                 <div
-                  className={`w-12 sm:w-24 h-px ${
+                  className={`w-10 sm:w-24 h-px ${
                     currentVisualStep > s ? "bg-accent" : "bg-white/10"
                   }`}
                 />
@@ -223,17 +223,17 @@ export default function AgendamentoPage() {
         {/* STEP 1 */}
         {step === 1 && (
           <div className="animate-fade-up">
-            <h1 className="font-display text-4xl lg:text-5xl mb-3">
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
               O que você quer{" "}
               <span className="italic text-accent-glow">reservar</span>?
             </h1>
-            <p className="text-white/60 mb-10 max-w-xl">
+            <p className="text-white/60 mb-8 sm:mb-10 max-w-xl text-sm sm:text-base">
               Temos duas opções: alugue o espaço completo para seu evento, ou
               reserve uma mesa no pesque-pague.
             </p>
 
             {/* Tipo de reserva */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-12">
+            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mb-10 sm:mb-12">
               <button
                 onClick={() => setBookingType("VENUE")}
                 className={`text-left p-6 border-2 rounded-lg transition ${
@@ -276,8 +276,8 @@ export default function AgendamentoPage() {
                 <h2 className="font-display text-2xl mb-6">
                   Sobre seu <span className="italic text-accent">evento</span>
                 </h2>
-                <div className="grid lg:grid-cols-2 gap-10">
-                  <div className="space-y-8">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
                       <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-3">
                         Tipo de evento
@@ -378,8 +378,8 @@ export default function AgendamentoPage() {
                 <h2 className="font-display text-2xl mb-6">
                   Detalhes da <span className="italic text-accent">mesa</span>
                 </h2>
-                <div className="grid lg:grid-cols-2 gap-10">
-                  <div className="space-y-8">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
                       <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-3">
                         <Calendar size={14} className="inline mr-1" /> Dia da
@@ -434,15 +434,15 @@ export default function AgendamentoPage() {
         {/* STEP 2 — Cardápio (só VENUE) */}
         {step === 2 && (
           <div className="animate-fade-up">
-            <h1 className="font-display text-4xl lg:text-5xl mb-3">
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
               Monte seu <span className="italic text-accent-glow">cardápio</span>
             </h1>
-            <p className="text-white/60 mb-10 max-w-xl">
+            <p className="text-white/60 mb-8 sm:mb-10 max-w-xl text-sm sm:text-base">
               Marque os itens que você quer no seu evento. O valor é calculado
               automaticamente conforme você seleciona.
             </p>
 
-            <div className="grid lg:grid-cols-[1fr_360px] gap-8">
+            <div className="grid lg:grid-cols-[1fr_360px] gap-6 sm:gap-8">
               <div className="space-y-8">
                 {CARDAPIO.map((cat) => (
                   <div
@@ -544,10 +544,10 @@ export default function AgendamentoPage() {
         {/* STEP 3 — Contato */}
         {step === 3 && (
           <div className="animate-fade-up max-w-2xl">
-            <h1 className="font-display text-4xl lg:text-5xl mb-3">
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
               Seus <span className="italic text-accent-glow">dados</span>
             </h1>
-            <p className="text-white/60 mb-10">
+            <p className="text-white/60 mb-8 sm:mb-10 text-sm sm:text-base">
               Falta pouco! Preencha seus dados para enviarmos sua solicitação.
             </p>
 
@@ -645,11 +645,11 @@ export default function AgendamentoPage() {
         )}
 
         {/* Nav */}
-        <div className="mt-12 flex justify-between gap-4">
+        <div className="mt-10 sm:mt-12 flex justify-between gap-3 sm:gap-4">
           {step > 1 ? (
             <button
               onClick={goPrev}
-              className="px-6 py-3 border border-white/15 rounded-md hover:border-white/40 transition"
+              className="px-4 sm:px-6 py-3 border border-white/15 rounded-md hover:border-white/40 transition text-sm sm:text-base"
             >
               ← Voltar
             </button>
@@ -660,21 +660,21 @@ export default function AgendamentoPage() {
             <button
               onClick={goNext}
               disabled={!canNext()}
-              className="btn-shine inline-flex items-center gap-2 px-7 py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="btn-shine inline-flex items-center gap-2 px-5 sm:px-7 py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow disabled:opacity-30 disabled:cursor-not-allowed transition text-sm sm:text-base"
             >
-              Continuar <ChevronRight size={18} />
+              Continuar <ChevronRight size={16} />
             </button>
           ) : (
             <button
               onClick={submit}
               disabled={!canNext() || submitting}
-              className="btn-shine inline-flex items-center gap-2 px-7 py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="btn-shine inline-flex items-center gap-2 px-5 sm:px-7 py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow disabled:opacity-30 disabled:cursor-not-allowed transition text-sm sm:text-base"
             >
               {submitting ? (
                 "Enviando..."
               ) : (
                 <>
-                  <Send size={16} /> Enviar pedido
+                  <Send size={15} /> Enviar pedido
                 </>
               )}
             </button>
