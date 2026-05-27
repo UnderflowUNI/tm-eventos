@@ -35,7 +35,12 @@
       "Bash(curl -s -X POST http://localhost:3099/api/booking -H 'Content-Type: application/json' -d '{}' -w '\\\\nHTTP: %{http_code}')",
       "Bash(curl -s -X POST http://localhost:3099/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test\\\\x00@evil.com\",\"password\":\"pass\"}' -w '\\\\nHTTP: %{http_code}')",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(sed -i 's|router.push\\(\"/admin\"\\);|router.push\\(\"/painel\"\\);|g' /home/erickxavier/Documentos/tm-eventos/app/painel/login/page.tsx)",
+      "Bash(sed -i 's|redirect\\(\"/admin/login\"\\)|redirect\\(\"/painel/login\"\\)|g' /home/erickxavier/Documentos/tm-eventos/app/painel/page.tsx)",
+      "Bash(sed -i 's|/api/admin/|/api/painel/|g' /home/erickxavier/Documentos/tm-eventos/app/painel/AdminDashboard.tsx)",
+      "Bash(sed -i 's|router.push\\(\"/admin/login\"\\)|router.push\\(\"/painel/login\"\\)|g' /home/erickxavier/Documentos/tm-eventos/app/painel/AdminDashboard.tsx)",
+      "Bash(git push *)"
     ]
   }
 }
