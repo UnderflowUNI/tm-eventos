@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       selections: bookingType === "VENUE" ? (selections || []) : [],
     });
 
-    const ownerPhone = process.env.OWNER_WHATSAPP || "5531984672190";
+    const ownerPhone = process.env.OWNER_WHATSAPP || "5532984969955";
     const whatsappLink = buildWhatsappLink(ownerPhone, text);
 
     sendWhatsAppAuto(text).catch(() => {});

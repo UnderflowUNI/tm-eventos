@@ -4,15 +4,18 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  AlertCircle,
   Calendar,
   Users,
   MessageCircle,
   Check,
+  CheckCircle2,
   ChevronRight,
   Send,
   Sparkles,
   Fish,
   PartyPopper,
+  X,
 } from "lucide-react";
 import {
   CARDAPIO,
@@ -33,6 +36,22 @@ const EVENTOS = [
 ];
 
 const TODAY = new Date().toISOString().split("T")[0];
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validatePhone(v: string): string {
+  const d = v.replace(/\D/g, "");
+  if (!v.trim()) return "WhatsApp é obrigatório";
+  if (d.length < 10) return "Número incompleto — informe DDD + número";
+  if (d.length > 13) return "Número inválido — verifique os dígitos";
+  return "";
+}
+
+function validateEmail(v: string): string {
+  if (!v.trim()) return "";
+  if (!EMAIL_RE.test(v)) return "E-mail inválido — verifique o formato";
+  if (v.length > 254) return "E-mail muito longo";
+  return "";
+}
 
 export default function AgendamentoPage() {
   const [step, setStep] = useState(1);
@@ -51,6 +70,17 @@ export default function AgendamentoPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ link: string } | null>(null);
 
+  // Validação em tempo real
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const phoneError = phoneTouched ? validatePhone(whatsapp) : "";
+  const emailError = emailTouched ? validateEmail(email) : "";
+  const phoneOk = phoneTouched && !validatePhone(whatsapp);
+  const emailOk = emailTouched && !!email.trim() && !validateEmail(email);
+
+  // Modal de erro
+  const [errModal, setErrModal] = useState("");
+
   const isVenue = bookingType === "VENUE";
   const isTable = bookingType === "TABLE";
 
@@ -63,15 +93,12 @@ export default function AgendamentoPage() {
     [selections, guests]
   );
 
-  // Quantos dias o range cobre
   const diasRange = useMemo(() => {
     if (!isVenue || !eventDate) return 1;
     const end = eventEndDate || eventDate;
     const s = new Date(eventDate + "T12:00");
     const e = new Date(end + "T12:00");
-    const diff = Math.round(
-      (e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diff = Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
     return Math.max(1, diff + 1);
   }, [isVenue, eventDate, eventEndDate]);
 
@@ -85,7 +112,7 @@ export default function AgendamentoPage() {
   const canNext = () => {
     if (step === 1) {
       if (!bookingType) return false;
-      if (isVenue) {
+      if (isVenue)
         return (
           !!eventType &&
           !!eventDate &&
@@ -93,17 +120,19 @@ export default function AgendamentoPage() {
           guests > 0 &&
           (!eventEndDate || eventEndDate >= eventDate)
         );
-      }
-      if (isTable) {
+      if (isTable)
         return !!eventDate && typeof guests === "number" && guests > 0;
-      }
     }
-    if (step === 2) return selections.size > 0; // só roda pra VENUE
-    if (step === 3) return clientName.trim() && whatsapp.trim();
+    if (step === 2) return selections.size > 0;
+    if (step === 3)
+      return (
+        !!clientName.trim() &&
+        !validatePhone(whatsapp) &&
+        !validateEmail(email)
+      );
     return true;
   };
 
-  // Pra TABLE, pulamos o step 2 (cardápio)
   const goNext = () => {
     if (step === 1 && isTable) setStep(3);
     else setStep(step + 1);
@@ -114,6 +143,10 @@ export default function AgendamentoPage() {
   };
 
   const submit = async () => {
+    setPhoneTouched(true);
+    setEmailTouched(true);
+    if (validatePhone(whatsapp) || validateEmail(email)) return;
+
     setSubmitting(true);
     try {
       const res = await fetch("/api/booking", {
@@ -133,41 +166,64 @@ export default function AgendamentoPage() {
         }),
       });
       const data = await res.json();
-      if (data.whatsappLink) setDone({ link: data.whatsappLink });
-      else alert(data.error || "Erro ao enviar.");
-    } catch (e) {
-      alert("Erro ao enviar. Tente novamente em instantes.");
+      if (data.whatsappLink) {
+        setDone({ link: data.whatsappLink });
+      } else {
+        setErrModal(data.error || "Erro ao enviar. Tente novamente.");
+      }
+    } catch {
+      setErrModal("Sem conexão. Verifique sua internet e tente novamente.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  // ── Tela de sucesso ──────────────────────────────────────────────────────────
   if (done) {
     return (
-      <div className="min-h-screen bg-ink-900 text-white grid place-items-center px-6">
-        <div className="max-w-lg text-center">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-full bg-accent/20 border border-accent grid place-items-center">
-            <Check size={40} className="text-accent" />
+      <div className="min-h-screen bg-ink-900 text-white grid place-items-center px-6 py-12">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-accent/15 border-2 border-accent flex items-center justify-center">
+              <Check size={36} className="text-accent" />
+            </div>
+            <h1 className="font-display text-4xl mb-3">Quase lá!</h1>
+            <p className="text-white/60 text-sm leading-relaxed">
+              Solicitação registrada com sucesso. Clique no botão abaixo para
+              abrir o WhatsApp com a mensagem já pronta — a proprietária
+              receberá tudo organizado e entrará em contato em breve.
+            </p>
           </div>
-          <h1 className="font-display text-4xl mb-4">Quase lá!</h1>
-          <p className="text-white/70 mb-8">
-            Para confirmar sua solicitação, basta clicar abaixo para abrir o WhatsApp
-            já com a lista pronta. A proprietária receberá tudo organizadinho e
-            entrará em contato em breve.
-          </p>
+
+          <div className="bg-ink-800/50 border border-accent/20 rounded-xl p-5 mb-6 space-y-3">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={16} className="text-green-400 shrink-0" />
+              <span className="text-sm text-white/80">Solicitação registrada no sistema</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={16} className="text-green-400 shrink-0" />
+              <span className="text-sm text-white/80">Data bloqueada no calendário</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={16} className="text-green-400 shrink-0" />
+              <span className="text-sm text-white/80">Mensagem WhatsApp pronta para envio</span>
+            </div>
+          </div>
+
           <a
             href={done.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-shine inline-flex items-center gap-3 px-8 py-4 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow transition"
+            className="btn-shine w-full flex items-center justify-center gap-3 px-8 py-4 bg-accent text-ink-900 font-bold rounded-xl hover:bg-accent-glow transition text-base mb-4"
           >
             <MessageCircle size={20} />
             Enviar pelo WhatsApp
             <ChevronRight size={18} />
           </a>
+
           <Link
             href="/"
-            className="mt-6 block text-sm text-white/40 hover:text-white transition"
+            className="block text-center text-sm text-white/40 hover:text-white transition"
           >
             ← Voltar para o início
           </Link>
@@ -181,9 +237,41 @@ export default function AgendamentoPage() {
 
   return (
     <div className="min-h-screen bg-ink-900 text-white wood-pattern">
+      {/* ── Modal de erro ──────────────────────────────────────────────────── */}
+      {errModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="bg-ink-800 border border-red-500/30 rounded-2xl p-8 max-w-sm w-full shadow-2xl">
+            <div className="flex justify-between items-start mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center shrink-0">
+                  <AlertCircle size={20} className="text-red-400" />
+                </div>
+                <h3 className="font-display text-xl">Algo deu errado</h3>
+              </div>
+              <button
+                onClick={() => setErrModal("")}
+                className="text-white/30 hover:text-white/80 transition p-1"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-white/60 text-sm mb-6 leading-relaxed">{errModal}</p>
+            <button
+              onClick={() => setErrModal("")}
+              className="btn-shine w-full py-3 bg-accent text-ink-900 font-bold rounded-lg transition"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      )}
+
       <header className="border-b border-white/5 bg-ink-900/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 text-white/70 hover:text-white text-sm sm:text-base">
+          <Link
+            href="/"
+            className="flex items-center gap-2 sm:gap-3 text-white/70 hover:text-white text-sm sm:text-base"
+          >
             <ArrowLeft size={16} /> Voltar
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -220,7 +308,7 @@ export default function AgendamentoPage() {
           ))}
         </div>
 
-        {/* STEP 1 */}
+        {/* ── STEP 1 ── */}
         {step === 1 && (
           <div className="animate-fade-up">
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
@@ -232,7 +320,6 @@ export default function AgendamentoPage() {
               reserve uma mesa no pesque-pague.
             </p>
 
-            {/* Tipo de reserva */}
             <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mb-10 sm:mb-12">
               <button
                 onClick={() => setBookingType("VENUE")}
@@ -243,9 +330,7 @@ export default function AgendamentoPage() {
                 }`}
               >
                 <PartyPopper className="text-accent mb-3" size={28} />
-                <div className="font-display text-xl mb-1">
-                  Aluguel do espaço
-                </div>
+                <div className="font-display text-xl mb-1">Aluguel do espaço</div>
                 <div className="text-sm text-white/60">
                   Casamentos, formaturas, aniversários e eventos especiais.
                   Pode reservar por <strong>vários dias</strong>.
@@ -260,9 +345,7 @@ export default function AgendamentoPage() {
                 }`}
               >
                 <Fish className="text-accent mb-3" size={28} />
-                <div className="font-display text-xl mb-1">
-                  Reserva de mesa (Pesque-Pague)
-                </div>
+                <div className="font-display text-xl mb-1">Reserva de mesa (Pesque-Pague)</div>
                 <div className="text-sm text-white/60">
                   Garanta sua mesa pra um dia específico de pescaria e almoço.
                   <strong> 1 dia só</strong>.
@@ -270,7 +353,7 @@ export default function AgendamentoPage() {
               </button>
             </div>
 
-            {/* Detalhes do VENUE */}
+            {/* Detalhes VENUE */}
             {isVenue && (
               <div className="animate-fade-up">
                 <h2 className="font-display text-2xl mb-6">
@@ -337,16 +420,13 @@ export default function AgendamentoPage() {
                     {eventDate && (
                       <div className="text-xs text-accent/80 flex items-center gap-2">
                         <Sparkles size={12} />
-                        {diasRange === 1
-                          ? "1 dia de aluguel"
-                          : `${diasRange} dias de aluguel`}
+                        {diasRange === 1 ? "1 dia de aluguel" : `${diasRange} dias de aluguel`}
                       </div>
                     )}
 
                     <div>
                       <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-3">
-                        <Users size={14} className="inline mr-1" /> Número de
-                        convidados
+                        <Users size={14} className="inline mr-1" /> Número de convidados
                       </label>
                       <input
                         type="number"
@@ -360,8 +440,8 @@ export default function AgendamentoPage() {
                       />
                       {typeof guests === "number" && guests > 250 && (
                         <div className="mt-2 text-xs text-amber-400 flex items-center gap-2">
-                          <Sparkles size={12} /> Eventos com mais de 250 pessoas
-                          incluem banheirista e manobrista.
+                          <Sparkles size={12} /> Eventos com mais de 250 pessoas incluem
+                          banheirista e manobrista.
                         </div>
                       )}
                     </div>
@@ -372,7 +452,7 @@ export default function AgendamentoPage() {
               </div>
             )}
 
-            {/* Detalhes do TABLE */}
+            {/* Detalhes TABLE */}
             {isTable && (
               <div className="animate-fade-up">
                 <h2 className="font-display text-2xl mb-6">
@@ -382,8 +462,7 @@ export default function AgendamentoPage() {
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-3">
-                        <Calendar size={14} className="inline mr-1" /> Dia da
-                        reserva
+                        <Calendar size={14} className="inline mr-1" /> Dia da reserva
                       </label>
                       <input
                         type="date"
@@ -392,14 +471,11 @@ export default function AgendamentoPage() {
                         onChange={(e) => setEventDate(e.target.value)}
                         className="w-full bg-ink-800 border border-white/10 rounded-md px-4 py-3 text-white focus:border-accent focus:outline-none"
                       />
-                      <div className="text-xs text-white/40 mt-2">
-                        Reserva é para o dia inteiro
-                      </div>
+                      <div className="text-xs text-white/40 mt-2">Reserva é para o dia inteiro</div>
                     </div>
                     <div>
                       <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-3">
-                        <Users size={14} className="inline mr-1" /> Quantas
-                        pessoas na mesa?
+                        <Users size={14} className="inline mr-1" /> Quantas pessoas na mesa?
                       </label>
                       <input
                         type="number"
@@ -415,12 +491,9 @@ export default function AgendamentoPage() {
                     </div>
 
                     <div className="p-5 bg-accent/5 border border-accent/20 rounded-md text-sm text-white/70 leading-relaxed">
-                      <div className="text-accent font-semibold mb-1">
-                        Como funciona
-                      </div>
+                      <div className="text-accent font-semibold mb-1">Como funciona</div>
                       Você reserva o dia, vem pescar e almoçar. O pagamento da
-                      pescaria e do consumo é feito direto no local com a equipe
-                      do TM.
+                      pescaria e do consumo é feito direto no local com a equipe do TM.
                     </div>
                   </div>
 
@@ -431,7 +504,7 @@ export default function AgendamentoPage() {
           </div>
         )}
 
-        {/* STEP 2 — Cardápio (só VENUE) */}
+        {/* ── STEP 2 — Cardápio (só VENUE) ── */}
         {step === 2 && (
           <div className="animate-fade-up">
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
@@ -468,21 +541,15 @@ export default function AgendamentoPage() {
                           >
                             <div
                               className={`w-5 h-5 grid place-items-center rounded border transition ${
-                                checked
-                                  ? "bg-accent border-accent"
-                                  : "border-white/30"
+                                checked ? "bg-accent border-accent" : "border-white/30"
                               }`}
                             >
-                              {checked && (
-                                <Check size={12} className="text-ink-900" />
-                              )}
+                              {checked && <Check size={12} className="text-ink-900" />}
                             </div>
                             <div className="flex-1">
                               <div className="text-sm font-medium">{item.nome}</div>
                               {item.descricao && (
-                                <div className="text-xs text-white/40 mt-0.5">
-                                  {item.descricao}
-                                </div>
+                                <div className="text-xs text-white/40 mt-0.5">{item.descricao}</div>
                               )}
                             </div>
                             <div className="text-xs text-accent font-mono">
@@ -512,13 +579,9 @@ export default function AgendamentoPage() {
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <div className="text-xs text-white/60 mb-3">
                       <strong className="text-white/80">{selections.size}</strong>{" "}
-                      {selections.size === 1
-                        ? "item selecionado"
-                        : "itens selecionados"}
+                      {selections.size === 1 ? "item selecionado" : "itens selecionados"}
                     </div>
-                    <div className="text-[11px] text-white/40 leading-relaxed">
-                      {orcamento.obs}
-                    </div>
+                    <div className="text-[11px] text-white/40 leading-relaxed">{orcamento.obs}</div>
                   </div>
 
                   <details className="mt-6">
@@ -541,7 +604,7 @@ export default function AgendamentoPage() {
           </div>
         )}
 
-        {/* STEP 3 — Contato */}
+        {/* ── STEP 3 — Contato ── */}
         {step === 3 && (
           <div className="animate-fade-up max-w-2xl">
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-3">
@@ -558,21 +621,95 @@ export default function AgendamentoPage() {
                 onChange={setClientName}
                 placeholder="Como podemos te chamar?"
               />
+
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field
-                  label="WhatsApp *"
-                  value={whatsapp}
-                  onChange={setWhatsapp}
-                  placeholder="(31) 9 9999-9999"
-                />
-                <Field
-                  label="E-mail"
-                  value={email}
-                  onChange={setEmail}
-                  placeholder="seu@email.com"
-                  type="email"
-                />
+                {/* WhatsApp com validação em tempo real */}
+                <div>
+                  <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-2">
+                    WhatsApp *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={whatsapp}
+                      onChange={(e) => {
+                        setWhatsapp(e.target.value);
+                        if (phoneTouched) setPhoneTouched(true);
+                      }}
+                      onBlur={() => setPhoneTouched(true)}
+                      placeholder="(32) 9 9999-9999"
+                      className={`w-full bg-ink-800 border rounded-md px-4 py-3 pr-10 text-white focus:outline-none transition ${
+                        phoneError
+                          ? "border-red-500/70 focus:border-red-500"
+                          : phoneOk
+                          ? "border-green-500/50 focus:border-green-400"
+                          : "border-white/10 focus:border-accent"
+                      }`}
+                    />
+                    {phoneOk && (
+                      <Check
+                        size={15}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400"
+                      />
+                    )}
+                    {phoneError && (
+                      <AlertCircle
+                        size={15}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400"
+                      />
+                    )}
+                  </div>
+                  {phoneError && (
+                    <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5">
+                      <AlertCircle size={11} /> {phoneError}
+                    </p>
+                  )}
+                </div>
+
+                {/* E-mail com validação em tempo real */}
+                <div>
+                  <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-2">
+                    E-mail
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (emailTouched) setEmailTouched(true);
+                      }}
+                      onBlur={() => setEmailTouched(true)}
+                      placeholder="seu@email.com"
+                      className={`w-full bg-ink-800 border rounded-md px-4 py-3 pr-10 text-white focus:outline-none transition ${
+                        emailError
+                          ? "border-red-500/70 focus:border-red-500"
+                          : emailOk
+                          ? "border-green-500/50 focus:border-green-400"
+                          : "border-white/10 focus:border-accent"
+                      }`}
+                    />
+                    {emailOk && (
+                      <Check
+                        size={15}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400"
+                      />
+                    )}
+                    {emailError && (
+                      <AlertCircle
+                        size={15}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400"
+                      />
+                    )}
+                  </div>
+                  {emailError && (
+                    <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5">
+                      <AlertCircle size={11} /> {emailError}
+                    </p>
+                  )}
+                </div>
               </div>
+
               <div>
                 <label className="block text-sm text-accent uppercase tracking-[0.2em] mb-2">
                   Observações
@@ -613,8 +750,7 @@ export default function AgendamentoPage() {
                       : "—"}
                     {isVenue && eventEndDate && eventEndDate !== eventDate && (
                       <>
-                        {" "}
-                        até{" "}
+                        {" "}até{" "}
                         {new Date(eventEndDate + "T12:00").toLocaleDateString("pt-BR")}{" "}
                         <span className="text-accent">({diasRange} dias)</span>
                       </>
@@ -629,8 +765,7 @@ export default function AgendamentoPage() {
                   {isVenue && (
                     <>
                       <li>
-                        <strong className="text-white">Itens:</strong>{" "}
-                        {selections.size}
+                        <strong className="text-white">Itens:</strong> {selections.size}
                       </li>
                       <li className="pt-2 border-t border-white/10 text-accent font-bold">
                         Total estimado: R${" "}
@@ -644,7 +779,7 @@ export default function AgendamentoPage() {
           </div>
         )}
 
-        {/* Nav */}
+        {/* Navegação */}
         <div className="mt-10 sm:mt-12 flex justify-between gap-3 sm:gap-4">
           {step > 1 ? (
             <button
