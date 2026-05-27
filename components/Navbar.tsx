@@ -53,17 +53,6 @@ export function Navbar() {
               className="object-contain drop-shadow-[0_0_12px_rgba(94,234,212,0.35)]"
             />
           </div>
-          <div className="hidden sm:block">
-            <div className="font-display text-sm leading-none tracking-wide">
-              TM <span className="text-accent/80 italic font-normal">Salão de Eventos</span>
-            </div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-              Teixeira Machado · Canaã/MG
-            </div>
-          </div>
-          <div className="sm:hidden font-display text-sm">
-            TM <span className="text-accent/80 italic font-normal">Eventos</span>
-          </div>
         </Link>
 
         {/* Desktop nav */}
@@ -79,7 +68,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_OWNER_WHATSAPP || "5531984672190"}`}
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_OWNER_WHATSAPP || "5532984969955"}`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-shine flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-accent text-ink-900 font-semibold text-xs sm:text-sm rounded-md hover:bg-accent-glow transition"
