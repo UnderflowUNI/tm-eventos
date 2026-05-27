@@ -1,7 +1,28 @@
 import Image from "next/image";
 import { Phone, Mail, Instagram, MapPin, Clock } from "lucide-react";
 
+// Formata número internacional (ex: 5532984969955) → (32) 9 8496-9955
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "").replace(/^55/, ""); // remove código BR
+  if (digits.length === 11) {
+    // celular: DDD + 9 + 8 dígitos
+    return `(${digits.slice(0, 2)}) ${digits[2]} ${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    // fixo: DDD + 8 dígitos
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  return raw;
+}
+
 export function Footer() {
+  const whatsappRaw = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || "";
+  const phone1 = process.env.OWNER_PHONE_DISPLAY || formatPhone(whatsappRaw);
+  const phone2 = process.env.OWNER_PHONE_2_DISPLAY || "";
+  const email = process.env.OWNER_EMAIL || "teixeiramachado43@gmail.com";
+  const instagram = process.env.OWNER_INSTAGRAM || "teixeiramachado_";
+  const ownerName = process.env.OWNER_NAME || "Sra. Teixeira Machado";
+
   return (
     <footer
       id="contato"
@@ -52,17 +73,24 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <Phone size={14} className="mt-1 text-accent shrink-0" />
                 <div>
-                  <div>(31) 98467-2190</div>
-                  <div className="text-white/50">(31) 98257-4543</div>
+                  <a
+                    href={`https://wa.me/${process.env.NEXT_PUBLIC_OWNER_WHATSAPP || ""}`}
+                    className="hover:text-accent transition"
+                  >
+                    {phone1}
+                  </a>
+                  {phone2 && (
+                    <div className="text-white/50">{phone2}</div>
+                  )}
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Mail size={14} className="mt-1 text-accent shrink-0" />
                 <a
-                  href="mailto:teixeiramachado43@gmail.com"
+                  href={`mailto:${email}`}
                   className="hover:text-accent transition break-all"
                 >
-                  teixeiramachado43@gmail.com
+                  {email}
                 </a>
               </li>
               <li className="flex items-start gap-3">
@@ -95,16 +123,16 @@ export function Footer() {
               Siga-nos
             </div>
             <a
-              href="https://instagram.com/teixeiramachado_"
+              href={`https://instagram.com/${instagram}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-4 py-3 border border-white/15 hover:border-accent hover:text-accent rounded-md transition text-sm"
             >
-              <Instagram size={16} />@teixeiramachado_
+              <Instagram size={16} />@{instagram}
             </a>
             <div className="mt-6 sm:mt-8 text-xs text-white/40 leading-relaxed">
               <div className="font-mono">CNPJ 60.307.144/0001-17</div>
-              <div className="mt-1 italic">João Pedro Teixeira Machado</div>
+              <div className="mt-1 italic">{ownerName}</div>
             </div>
           </div>
         </div>

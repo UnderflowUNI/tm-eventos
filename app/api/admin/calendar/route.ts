@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { validateCalendarBlock, validateCalendarDelete, sanitizeStr } from "@/lib/validation";
 import {
   pushEventToGoogle,
   deleteEventFromGoogle,
@@ -53,8 +54,12 @@ export async function POST(req: NextRequest) {
   if (!(await requireAuth()))
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const body = await req.json();
-  const { status, label, eventType, clientName, note } = body;
+  const body = await req.json().catch(() => null);
+  const check = validateCalendarBlock(body);
+  if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
+
+  const { status, eventType, clientName, note } = body;
+  const label = body.label ? sanitizeStr(body.label, 120) : undefined;
 
   // Normaliza pra array
   let dates: string[] = [];
@@ -206,8 +211,9 @@ export async function DELETE(req: NextRequest) {
     : single
       ? [single]
       : [];
-  if (list.length === 0)
-    return NextResponse.json({ error: "Data faltando" }, { status: 400 });
+
+  const check = validateCalendarDelete(list);
+  if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
 
   const dts = list.map(parseDate);
   const toDeleteYmd = new Set(list);

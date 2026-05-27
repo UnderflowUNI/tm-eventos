@@ -1,22 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signSession } from "@/lib/auth";
+import { validateLogin } from "@/lib/validation";
 import bcrypt from "bcryptjs";
+
+// Hash real (custo 10) usado quando o e-mail não existe —
+// garante tempo constante e impede enumeração de usuários via timing.
+const DUMMY_HASH =
+  "$2a$10$2JTDpf4L5Pkl8N9v4AZcAOrhkPbQ27b3Wt9l06GHd40/O5YXOuf4S";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
-    if (!email || !password) {
-      return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
+    const body = await req.json().catch(() => null);
+
+    const check = validateLogin(body);
+    if (!check.ok) {
+      return NextResponse.json({ error: check.error }, { status: 400 });
     }
 
-    const user = await prisma.adminUser.findUnique({ where: { email } });
-    if (!user) {
-      return NextResponse.json({ error: "Credenciais inválidas" }, { status: 401 });
-    }
+    const { email, password } = body;
 
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) {
+    const user = await prisma.adminUser.findUnique({
+      where: { email: email.toLowerCase().trim() },
+    });
+
+    // Sempre roda bcrypt — mesmo quando usuário não existe — para evitar
+    // enumeração de e-mails via diferença de tempo de resposta.
+    const hashToCompare = user?.password ?? DUMMY_HASH;
+    const passwordOk = await bcrypt.compare(password, hashToCompare);
+
+    if (!user || !passwordOk) {
       return NextResponse.json({ error: "Credenciais inválidas" }, { status: 401 });
     }
 

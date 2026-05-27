@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calcularOrcamento } from "@/lib/cardapio";
+import { validateBooking, sanitizeStr } from "@/lib/validation";
 import {
   buildWhatsappLink,
   formatBookingMessage,
@@ -13,10 +14,9 @@ function parseDate(ymd: string) {
 
 function datesBetween(startYmd: string, endYmd: string): string[] {
   const out: string[] = [];
-  const s = parseDate(startYmd);
-  const e = parseDate(endYmd);
-  const cur = new Date(s);
-  while (cur <= e) {
+  const cur = new Date(startYmd + "T12:00:00");
+  const end = new Date(endYmd + "T12:00:00");
+  while (cur <= end) {
     out.push(cur.toISOString().split("T")[0]);
     cur.setDate(cur.getDate() + 1);
   }
@@ -25,48 +25,39 @@ function datesBetween(startYmd: string, endYmd: string): string[] {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+
+    const check = validateBooking(body);
+    if (!check.ok) {
+      return NextResponse.json({ error: check.error }, { status: 400 });
+    }
+
     const {
-      clientName,
-      whatsapp,
-      email,
+      clientName: rawName,
+      whatsapp: rawPhone,
+      email: rawEmail,
       bookingType: rawType,
       eventDate,
       eventEndDate,
       guests,
       eventType,
       selections,
-      message,
+      message: rawMessage,
     } = body;
 
-    const bookingType: "VENUE" | "TABLE" =
-      rawType === "TABLE" ? "TABLE" : "VENUE";
+    // Sanitiza strings antes de gravar
+    const clientName = sanitizeStr(rawName, 120);
+    const whatsapp = sanitizeStr(rawPhone, 20);
+    const email = rawEmail ? sanitizeStr(rawEmail, 254) : null;
+    const message = rawMessage ? sanitizeStr(rawMessage, 2000) : null;
 
-    if (!clientName || !whatsapp || !eventDate || !guests) {
-      return NextResponse.json(
-        { error: "Campos obrigatórios faltando" },
-        { status: 400 }
-      );
-    }
-    if (bookingType === "VENUE" && !eventType) {
-      return NextResponse.json(
-        { error: "Tipo de evento obrigatório para aluguel do espaço" },
-        { status: 400 }
-      );
-    }
+    const bookingType: "VENUE" | "TABLE" = rawType === "TABLE" ? "TABLE" : "VENUE";
 
     const startDate = parseDate(eventDate);
     const endDate =
       bookingType === "VENUE" && eventEndDate
         ? parseDate(eventEndDate)
         : startDate;
-
-    if (endDate < startDate) {
-      return NextResponse.json(
-        { error: "Data final não pode ser antes da inicial" },
-        { status: 400 }
-      );
-    }
 
     const orc =
       bookingType === "VENUE"
@@ -77,28 +68,22 @@ export async function POST(req: NextRequest) {
       data: {
         clientName,
         whatsapp,
-        email: email || null,
+        email,
         bookingType,
         eventDate: startDate,
         eventEndDate: bookingType === "VENUE" ? endDate : null,
-        guests,
+        guests: Number(guests),
         eventType: bookingType === "VENUE" ? eventType : null,
-        selections: bookingType === "VENUE" ? selections || [] : [],
+        selections: bookingType === "VENUE" ? (selections || []) : [],
         totalEstimate: orc.total,
-        message: message || null,
+        message,
       },
     });
 
-    // Bloqueia todas as datas no calendário público (PENDING)
     const dateList =
       bookingType === "VENUE"
         ? datesBetween(eventDate, eventEndDate || eventDate)
         : [eventDate];
-
-    const noteBase =
-      bookingType === "TABLE"
-        ? `Reserva pesque-pague — ${guests} pessoa(s)`
-        : `Solicitação automática — ${guests} convidados`;
 
     for (const d of dateList) {
       const dt = parseDate(d);
@@ -108,17 +93,18 @@ export async function POST(req: NextRequest) {
           status: "PENDING",
           clientName,
           eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
-          label:
-            bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
+          label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
         },
         create: {
           date: dt,
           status: "PENDING",
           clientName,
           eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
-          label:
-            bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
-          note: noteBase,
+          label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
+          note:
+            bookingType === "TABLE"
+              ? `Reserva pesque-pague — ${guests} pessoa(s)`
+              : `Solicitação automática — ${guests} convidados`,
         },
       });
     }
@@ -128,7 +114,7 @@ export async function POST(req: NextRequest) {
       eventDate: startDate,
       eventEndDate: bookingType === "VENUE" ? endDate : null,
       bookingType,
-      selections: bookingType === "VENUE" ? selections || [] : [],
+      selections: bookingType === "VENUE" ? (selections || []) : [],
     });
 
     const ownerPhone = process.env.OWNER_WHATSAPP || "5531984672190";

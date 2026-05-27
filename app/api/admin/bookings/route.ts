@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { validateBookingStatusPatch } from "@/lib/validation";
 
 export async function GET() {
   const session = await getSession();
@@ -19,13 +20,18 @@ export async function PATCH(req: NextRequest) {
   if (!session)
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const { id, status } = await req.json();
-  if (!id || !status)
-    return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  const check = validateBookingStatusPatch(body);
+  if (!check.ok) {
+    return NextResponse.json({ error: check.error }, { status: 400 });
+  }
 
-  const updated = await prisma.booking.update({
-    where: { id },
-    data: { status },
-  });
+  const { id, status } = body;
+
+  const existing = await prisma.booking.findUnique({ where: { id } });
+  if (!existing)
+    return NextResponse.json({ error: "Pedido não encontrado" }, { status: 404 });
+
+  const updated = await prisma.booking.update({ where: { id }, data: { status } });
   return NextResponse.json(updated);
 }
