@@ -34,22 +34,14 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 lg:gap-12">
           {/* Logo + Tagline */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+            <div className="mb-5 sm:mb-6">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20">
                 <Image
                   src="/brand/logo-tm.png"
                   alt="TM Salão de Eventos"
                   fill
-                  className="object-contain drop-shadow-[0_0_14px_rgba(94,234,212,0.3)]"
+                  className="object-contain drop-shadow-[0_0_18px_rgba(94,234,212,0.35)]"
                 />
-              </div>
-              <div>
-                <div className="font-display text-base sm:text-lg leading-none">
-                  TM <span className="italic text-accent/80 font-normal">Eventos</span>
-                </div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                  Teixeira Machado
-                </div>
               </div>
             </div>
             <p className="text-sm text-white/50 leading-relaxed max-w-xs">

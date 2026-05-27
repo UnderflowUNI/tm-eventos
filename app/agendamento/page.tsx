@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   AlertCircle,
@@ -107,6 +108,23 @@ export default function AgendamentoPage() {
     if (n.has(id)) n.delete(id);
     else n.add(id);
     setSelections(n);
+  };
+
+  // Clique no calendário — seleciona período (VENUE) ou dia único (TABLE)
+  const handleVenueCalendarClick = (dateStr: string) => {
+    if (!eventDate || (eventDate && eventEndDate)) {
+      setEventDate(dateStr);
+      setEventEndDate("");
+    } else if (dateStr >= eventDate) {
+      setEventEndDate(dateStr);
+    } else {
+      setEventEndDate(eventDate);
+      setEventDate(dateStr);
+    }
+  };
+
+  const handleTableCalendarClick = (dateStr: string) => {
+    setEventDate(dateStr);
   };
 
   const canNext = () => {
@@ -274,11 +292,13 @@ export default function AgendamentoPage() {
           >
             <ArrowLeft size={16} /> Voltar
           </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 border border-accent/60 rounded-md grid place-items-center font-display text-accent text-sm">
-              TM
-            </div>
-            <span className="hidden sm:inline text-sm">Espaço Teixeira Machado</span>
+          <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+            <Image
+              src="/brand/logo-tm.png"
+              alt="TM"
+              fill
+              className="object-contain drop-shadow-[0_0_10px_rgba(94,234,212,0.3)]"
+            />
           </div>
         </div>
       </header>
@@ -447,7 +467,11 @@ export default function AgendamentoPage() {
                     </div>
                   </div>
 
-                  <PublicCalendar />
+                  <PublicCalendar
+                    selectedStart={eventDate}
+                    selectedEnd={eventEndDate}
+                    onDayClick={handleVenueCalendarClick}
+                  />
                 </div>
               </div>
             )}
@@ -497,7 +521,10 @@ export default function AgendamentoPage() {
                     </div>
                   </div>
 
-                  <PublicCalendar />
+                  <PublicCalendar
+                    selectedStart={eventDate}
+                    onDayClick={handleTableCalendarClick}
+                  />
                 </div>
               </div>
             )}

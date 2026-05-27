@@ -44,7 +44,7 @@ export function Navbar() {
           className="flex items-center gap-2 sm:gap-3 group"
           onClick={() => setMenuOpen(false)}
         >
-          <div className="relative w-9 h-9 sm:w-12 sm:h-12 transition-transform duration-500 group-hover:scale-105">
+          <div className="relative w-12 h-12 sm:w-16 sm:h-16 transition-transform duration-500 group-hover:scale-105">
             <Image
               src="/brand/logo-tm.png"
               alt="TM Salão de Eventos"
