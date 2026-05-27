@@ -41,8 +41,8 @@ const SEC_HEADERS: Record<string, string> = {
 const BODY_SIZE_LIMITS: Record<string, number> = {
   "/api/auth/login": 1_024,        // 1 KB
   "/api/booking": 16_384,          // 16 KB
-  "/api/admin/calendar": 32_768,   // 32 KB
-  "/api/admin/bookings": 4_096,    // 4 KB
+  "/api/painel/calendar": 32_768,   // 32 KB
+  "/api/painel/bookings": 4_096,    // 4 KB
 };
 
 // ─── Middleware principal ─────────────────────────────────────────────────────
@@ -99,22 +99,22 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Proteção de rotas admin (páginas) ─────────────────────────────────────
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+  if (pathname.startsWith("/painel") && pathname !== "/painel/login") {
     const token = req.cookies.get("tm_session")?.value;
     if (!token) {
-      return NextResponse.redirect(new URL("/admin/login", req.url));
+      return NextResponse.redirect(new URL("/painel/login", req.url));
     }
     try {
       await jwtVerify(token, SECRET);
     } catch {
-      const redir = NextResponse.redirect(new URL("/admin/login", req.url));
+      const redir = NextResponse.redirect(new URL("/painel/login", req.url));
       redir.cookies.delete("tm_session");
       return redir;
     }
   }
 
   // ── Proteção de rotas admin (API) ─────────────────────────────────────────
-  if (pathname.startsWith("/api/admin")) {
+  if (pathname.startsWith("/api/painel")) {
     const token = req.cookies.get("tm_session")?.value;
     if (!token) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -127,7 +127,7 @@ export async function middleware(req: NextRequest) {
       return r;
     }
     // Rate limiting adicional na API admin (100 req/min por IP)
-    if (!allow(`admin-api:${ip}`, 100, 60_000)) {
+    if (!allow(`painel-api:${ip}`, 100, 60_000)) {
       return NextResponse.json({ error: "Rate limit excedido." }, { status: 429 });
     }
   }
@@ -140,8 +140,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/admin/:path*",
-    "/api/admin/:path*",
+    "/painel/:path*",
+    "/api/painel/:path*",
     "/api/auth/login",
     "/api/booking",
     "/api/calendar",
