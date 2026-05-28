@@ -38,13 +38,13 @@ export function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-20 sm:h-24 flex items-center justify-between">
         <Link
           href="/"
           className="flex items-center gap-2 sm:gap-3 group"
           onClick={() => setMenuOpen(false)}
         >
-          <div className="relative w-12 h-12 sm:w-16 sm:h-16 transition-transform duration-500 group-hover:scale-105">
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform duration-500 group-hover:scale-105">
             <Image
               src="/brand/logo-tm.png"
               alt="TM Salão de Eventos"
