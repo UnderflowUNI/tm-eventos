@@ -292,7 +292,7 @@ export default function AgendamentoPage() {
           >
             <ArrowLeft size={16} /> Voltar
           </Link>
-          <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14">
             <Image
               src="/brand/logo-tm.png"
               alt="TM"

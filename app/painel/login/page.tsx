@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { LogIn, AlertCircle, Eye, EyeOff, Clock } from "lucide-react";
 
 function LoginForm() {
@@ -49,8 +50,13 @@ function LoginForm() {
     <div className="min-h-screen bg-ink-900 grid place-items-center px-4 sm:px-6 wood-pattern">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 mx-auto mb-4 border border-accent/60 rounded-md grid place-items-center font-display text-accent text-3xl">
-            TM
+          <div className="relative w-20 h-20 mx-auto mb-4">
+            <Image
+              src="/brand/logo-tm.png"
+              alt="TM"
+              fill
+              className="object-contain drop-shadow-[0_0_18px_rgba(94,234,212,0.4)]"
+            />
           </div>
           <h1 className="font-display text-3xl">Painel Administrativo</h1>
           <p className="text-white/50 text-sm mt-2">

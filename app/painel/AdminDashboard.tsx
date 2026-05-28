@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Calendar,
   ChevronLeft,
@@ -156,8 +157,13 @@ export default function AdminDashboard({ userName }: { userName: string }) {
       <header className="border-b border-white/10 bg-ink-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between flex-wrap gap-3 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 border border-accent/60 rounded-md grid place-items-center font-display text-accent text-lg sm:text-xl">
-              TM
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0">
+              <Image
+                src="/brand/logo-tm.png"
+                alt="TM"
+                fill
+                className="object-contain drop-shadow-[0_0_12px_rgba(94,234,212,0.35)]"
+              />
             </div>
             <div>
               <div className="font-display text-lg sm:text-xl">Painel da Dona</div>
