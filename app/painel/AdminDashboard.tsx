@@ -56,6 +56,8 @@ export default function AdminDashboard({ userName }: { userName: string }) {
   const [blocked, setBlocked] = useState<BlockedDate[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [rangeAnchor, setRangeAnchor] = useState<string | null>(null);
+  const [hoverDate, setHoverDate] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -87,17 +89,32 @@ export default function AdminDashboard({ userName }: { userName: string }) {
 
   const blockedMap = new Map(blocked.map((b) => [b.date.split("T")[0], b]));
 
-  const toggleDate = (d: Date) => {
+  const handleDayClick = (d: Date) => {
     const key = ymd(d);
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+    if (!rangeAnchor) {
+      setRangeAnchor(key);
+      setSelected(new Set([key]));
+    } else {
+      const start = rangeAnchor < key ? rangeAnchor : key;
+      const end = rangeAnchor < key ? key : rangeAnchor;
+      const dates = new Set<string>();
+      const cur = new Date(start + "T12:00:00");
+      const endDate = new Date(end + "T12:00:00");
+      while (cur <= endDate) {
+        dates.add(ymd(cur));
+        cur.setDate(cur.getDate() + 1);
+      }
+      setSelected(dates);
+      setRangeAnchor(null);
+      setHoverDate(null);
+    }
   };
 
-  const clearSelection = () => setSelected(new Set());
+  const clearSelection = () => {
+    setSelected(new Set());
+    setRangeAnchor(null);
+    setHoverDate(null);
+  };
 
   const applyBlock = async (
     status: "OCCUPIED" | "PENDING",
@@ -213,9 +230,10 @@ export default function AdminDashboard({ userName }: { userName: string }) {
         {tab === "calendar" && (
           <div>
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 sm:p-5 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed">
-              <strong className="text-accent">Como usar:</strong> Toque nos dias
-              pra <strong>selecionar</strong> (pode selecionar vários!). Depois
-              aperte <strong>"Marcar"</strong> abaixo e escolha o status.
+              <strong className="text-accent">Como usar:</strong> Toque no{" "}
+              <strong>1º dia</strong> do período e depois no{" "}
+              <strong>último dia</strong> para selecionar o intervalo. Depois
+              aperte <strong>"Marcar"</strong> abaixo.
             </div>
 
             <div className="flex items-center justify-between mb-4 sm:mb-6 bg-ink-800 border border-white/10 rounded-lg p-3 sm:p-4">
@@ -266,6 +284,16 @@ export default function AdminDashboard({ userName }: { userName: string }) {
                   const status = row?.status;
                   const isToday = isSameDay(d, today);
                   const isSelected = selected.has(key);
+                  const isAnchor = key === rangeAnchor;
+
+                  // Preview range between anchor and hovered date
+                  const pStart = rangeAnchor && hoverDate
+                    ? (rangeAnchor < hoverDate ? rangeAnchor : hoverDate)
+                    : null;
+                  const pEnd = rangeAnchor && hoverDate
+                    ? (rangeAnchor < hoverDate ? hoverDate : rangeAnchor)
+                    : null;
+                  const isInPreview = !!(pStart && pEnd && key >= pStart && key <= pEnd && inMonth && !isPast);
 
                   let cls =
                     "relative aspect-square min-h-[36px] sm:min-h-[52px] lg:min-h-[64px] flex flex-col items-center justify-center text-sm sm:text-base lg:text-xl font-medium rounded-md transition cursor-pointer p-0.5 sm:p-1 ";
@@ -278,13 +306,17 @@ export default function AdminDashboard({ userName }: { userName: string }) {
                   else
                     cls += "bg-ink-700 text-white hover:bg-accent/30 hover:text-accent border-2 border-transparent ";
 
+                  if (isInPreview && !isSelected) cls += "bg-accent/20 text-accent border-2 border-accent/40 ";
                   if (isToday) cls += "ring-2 ring-accent ring-offset-1 sm:ring-offset-2 ring-offset-ink-800 ";
                   if (isSelected) cls += "outline outline-2 sm:outline-3 outline-accent scale-[0.96] ";
+                  if (isAnchor) cls += "bg-accent/30 ";
 
                   return (
                     <button
                       key={i}
-                      onClick={() => inMonth && !isPast && toggleDate(d)}
+                      onClick={() => inMonth && !isPast && handleDayClick(d)}
+                      onMouseEnter={() => { if (rangeAnchor && inMonth && !isPast) setHoverDate(key); }}
+                      onMouseLeave={() => setHoverDate(null)}
                       disabled={!inMonth || isPast}
                       className={cls}
                       title={row?.label || ""}
@@ -302,6 +334,12 @@ export default function AdminDashboard({ userName }: { userName: string }) {
                   );
                 })}
               </div>
+
+              {rangeAnchor && (
+                <div className="mt-3 text-sm text-center text-accent animate-pulse">
+                  Agora clique no último dia do período
+                </div>
+              )}
 
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/10 flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-base">
                 <Legend color="bg-ink-700 border-white/20" label="Livre" />
