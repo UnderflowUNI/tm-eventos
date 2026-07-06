@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { calcularOrcamento } from "@/lib/cardapio";
 import { validateBooking, sanitizeStr } from "@/lib/validation";
 import {
@@ -64,21 +64,23 @@ export async function POST(req: NextRequest) {
         ? calcularOrcamento(selections || [], guests)
         : { total: 0, porPessoa: 0, obs: "" };
 
-    const booking = await prisma.booking.create({
-      data: {
-        clientName,
-        whatsapp,
-        email,
-        bookingType,
-        eventDate: startDate,
-        eventEndDate: bookingType === "VENUE" ? endDate : null,
-        guests: Number(guests),
-        eventType: bookingType === "VENUE" ? eventType : null,
-        selections: bookingType === "VENUE" ? (selections || []) : [],
-        totalEstimate: orc.total,
-        message,
-      },
-    });
+    const booking = await withRetry(() =>
+      prisma.booking.create({
+        data: {
+          clientName,
+          whatsapp,
+          email,
+          bookingType,
+          eventDate: startDate,
+          eventEndDate: bookingType === "VENUE" ? endDate : null,
+          guests: Number(guests),
+          eventType: bookingType === "VENUE" ? eventType : null,
+          selections: bookingType === "VENUE" ? (selections || []) : [],
+          totalEstimate: orc.total,
+          message,
+        },
+      })
+    );
 
     const dateList =
       bookingType === "VENUE"
@@ -87,26 +89,28 @@ export async function POST(req: NextRequest) {
 
     for (const d of dateList) {
       const dt = parseDate(d);
-      await prisma.blockedDate.upsert({
-        where: { date: dt },
-        update: {
-          status: "PENDING",
-          clientName,
-          eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
-          label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
-        },
-        create: {
-          date: dt,
-          status: "PENDING",
-          clientName,
-          eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
-          label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
-          note:
-            bookingType === "TABLE"
-              ? `Reserva pesque-pague — ${guests} pessoa(s)`
-              : `Solicitação automática — ${guests} convidados`,
-        },
-      });
+      await withRetry(() =>
+        prisma.blockedDate.upsert({
+          where: { date: dt },
+          update: {
+            status: "PENDING",
+            clientName,
+            eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
+            label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
+          },
+          create: {
+            date: dt,
+            status: "PENDING",
+            clientName,
+            eventType: bookingType === "VENUE" ? eventType : "Reserva de mesa",
+            label: bookingType === "TABLE" ? `Mesa · ${clientName}` : clientName,
+            note:
+              bookingType === "TABLE"
+                ? `Reserva pesque-pague — ${guests} pessoa(s)`
+                : `Solicitação automática — ${guests} convidados`,
+          },
+        })
+      );
     }
 
     const text = formatBookingMessage({

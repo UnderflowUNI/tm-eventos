@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 
 // GET /api/calendar?year=2026&month=4
 export async function GET(req: NextRequest) {
@@ -12,10 +12,12 @@ export async function GET(req: NextRequest) {
   const end = new Date(year, month + 2, 0);
 
   try {
-    const rows = await prisma.blockedDate.findMany({
-      where: { date: { gte: start, lte: end } },
-      select: { date: true, status: true },
-    });
+    const rows = await withRetry(() =>
+      prisma.blockedDate.findMany({
+        where: { date: { gte: start, lte: end } },
+        select: { date: true, status: true },
+      })
+    );
     return NextResponse.json(rows);
   } catch (e) {
     console.error("[calendar] GET error:", e);
