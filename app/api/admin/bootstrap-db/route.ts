@@ -61,5 +61,15 @@ export async function POST(req: NextRequest) {
     results.push(sql.split("\n")[0]);
   }
 
-  return NextResponse.json({ ok: true, ran: results });
+  const admin = await prisma.adminUser.upsert({
+    where: { email: "dona@teixeiramachado.com" },
+    update: {},
+    create: {
+      email: "dona@teixeiramachado.com",
+      password: "$2a$10$z0fm1HpBakl3J/71TQkSp.X5enFgqvGJc5gE0DnGNHqoaaobq9ld6",
+      name: "Sra. Teixeira Machado",
+    },
+  });
+
+  return NextResponse.json({ ok: true, ran: results, adminEmail: admin.email });
 }
