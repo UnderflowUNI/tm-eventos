@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+// Todas as cores vêm dos tokens em app/globals.css — nada hardcoded aqui.
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
@@ -7,56 +8,67 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Fraunces", "serif"],
-        sans: ["Manrope", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
-        ink: {
-          900: "#0a0807",
-          800: "#141110",
-          700: "#1f1a18",
-          600: "#2b2421",
+        bg: "rgb(var(--c-bg) / <alpha-value>)",
+        surface: {
+          DEFAULT: "rgb(var(--c-surface) / <alpha-value>)",
+          2: "rgb(var(--c-surface-2) / <alpha-value>)",
         },
-        wood: {
-          100: "#f3e3cf",
-          200: "#dcb88e",
-          300: "#b8854f",
-          400: "#8b5a2b",
-          500: "#5e3a18",
-        },
+        ink: "rgb(var(--c-text) / <alpha-value>)",
+        muted: "rgb(var(--c-muted) / <alpha-value>)",
         accent: {
-          DEFAULT: "#5eead4",
-          glow: "#2dd4bf",
-          deep: "#0f766e",
+          DEFAULT: "rgb(var(--c-accent) / <alpha-value>)",
+          contrast: "rgb(var(--c-accent-contrast) / <alpha-value>)",
         },
+        terra: "rgb(var(--c-terra) / <alpha-value>)",
+        bronze: "rgb(var(--c-bronze) / <alpha-value>)",
+        line: "rgb(var(--c-border) / <alpha-value>)",
+        danger: "rgb(var(--c-danger) / <alpha-value>)",
+        success: "rgb(var(--c-success) / <alpha-value>)",
+        warn: "rgb(var(--c-warn) / <alpha-value>)",
+      },
+      fontSize: {
+        // Escala fluida — limites em rem para acompanhar o controle A/A+/A++
+        display: [
+          "clamp(2.75rem, 1.1rem + 6.2vw, 6.25rem)",
+          { lineHeight: "1.0", letterSpacing: "-0.015em" },
+        ],
+        "display-sm": [
+          "clamp(2.125rem, 1.1rem + 3.4vw, 4rem)",
+          { lineHeight: "1.06", letterSpacing: "-0.01em" },
+        ],
+        title: [
+          "clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem)",
+          { lineHeight: "1.15" },
+        ],
+      },
+      borderRadius: {
+        DEFAULT: "var(--radius)",
+      },
+      transitionDuration: {
+        fast: "var(--dur-fast)",
+        base: "var(--dur-base)",
+      },
+      transitionTimingFunction: {
+        base: "var(--ease)",
       },
       animation: {
-        "fade-up": "fadeUp 0.8s ease-out forwards",
-        "fade-in": "fadeIn 0.6s ease-out forwards",
-        shimmer: "shimmer 2.5s linear infinite",
-        float: "float 6s ease-in-out infinite",
+        "fade-up": "fadeUp 0.7s var(--ease) forwards",
+        "fade-in": "fadeIn 0.5s var(--ease) forwards",
       },
       keyframes: {
         fadeUp: {
-          "0%": { opacity: "0", transform: "translateY(24px)" },
+          "0%": { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         fadeIn: {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
-        shimmer: {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-8px)" },
-        },
-      },
-      backgroundImage: {
-        "grain":
-          "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")",
       },
     },
   },

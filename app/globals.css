@@ -2,117 +2,174 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tipografia: Fraunces (display serif, expressiva) + Manrope (sans, refinada) */
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Manrope:wght@300;400;500;600;700;800&display=swap");
-
+/*
+  Design system "Varanda" — fonte única de verdade dos tokens.
+  Tema claro é o primário; o escuro é a "varanda à noite".
+  Cores em tripla RGB para o Tailwind aplicar alpha (rgb(var(--x) / a)).
+*/
 :root {
-  --ink-900: #0a0807;
-  --ink-800: #141110;
-  --ink-700: #1f1a18;
-  --wood-300: #b8854f;
-  --accent: #5eead4;
-  --accent-deep: #0f766e;
+  color-scheme: light;
+
+  --c-bg: 247 241 230;          /* papel  #F7F1E6 */
+  --c-surface: 253 250 242;     /* cartão #FDFAF2 */
+  --c-surface-2: 239 230 213;   /* apoio  #EFE6D5 */
+  --c-text: 42 33 21;           /* tinta  #2A2115 */
+  --c-muted: 100 88 67;         /* #645843 — 6.1:1 sobre o papel */
+  --c-accent: 31 91 63;         /* verde-mata #1F5B3F */
+  --c-accent-contrast: 247 241 230;
+  --c-terra: 182 92 56;         /* telha #B65C38 — só no motivo e detalhes grandes */
+  --c-bronze: 122 94 46;        /* #7A5E2E — eyebrows e metadados mono */
+  --c-border: 223 211 190;      /* #DFD3BE */
+  --c-danger: 163 52 39;        /* #A33427 */
+  --c-success: 31 91 63;
+  --c-warn: 138 90 20;          /* #8A5A14 */
+
+  --radius: 2px;
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --c-bg: 26 20 14;           /* madeira profunda #1A140E */
+    --c-surface: 36 28 20;      /* #241C14 */
+    --c-surface-2: 48 39 28;    /* #30271C */
+    --c-text: 241 233 219;      /* #F1E9DB */
+    --c-muted: 180 167 142;     /* #B4A78E */
+    --c-accent: 147 207 169;    /* verde-mata clareado #93CFA9 */
+    --c-accent-contrast: 20 32 25;
+    --c-terra: 217 138 98;      /* #D98A62 */
+    --c-bronze: 198 169 107;    /* #C6A96B */
+    --c-border: 58 48 35;       /* #3A3023 */
+    --c-danger: 229 138 118;    /* #E58A76 */
+    --c-success: 147 207 169;
+    --c-warn: 224 177 94;       /* #E0B15E */
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --c-bg: 26 20 14;
+  --c-surface: 36 28 20;
+  --c-surface-2: 48 39 28;
+  --c-text: 241 233 219;
+  --c-muted: 180 167 142;
+  --c-accent: 147 207 169;
+  --c-accent-contrast: 20 32 25;
+  --c-terra: 217 138 98;
+  --c-bronze: 198 169 107;
+  --c-border: 58 48 35;
+  --c-danger: 229 138 118;
+  --c-success: 147 207 169;
+  --c-warn: 224 177 94;
+}
+
+/* Controle A / A+ / A++ — todo o layout é rem-based, então escala inteiro */
+:root[data-font-scale="1"] { font-size: 112.5%; }
+:root[data-font-scale="2"] { font-size: 125%; }
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
-  background: var(--ink-900);
-  color: #f1ebe5;
-  font-family: "Manrope", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+html {
   scroll-behavior: smooth;
 }
 
-::selection {
-  background: var(--accent);
-  color: var(--ink-900);
+body {
+  background: rgb(var(--c-bg));
+  color: rgb(var(--c-text));
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
 }
 
-/* Scrollbar tematizada */
+::selection {
+  background: rgb(var(--c-accent));
+  color: rgb(var(--c-accent-contrast));
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--c-accent));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* Link "pular para o conteúdo" — visível só ao focar */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: rgb(var(--c-accent));
+  color: rgb(var(--c-accent-contrast));
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: var(--radius);
+  transition: top var(--dur-fast) var(--ease);
+}
+.skip-link:focus-visible {
+  top: 1rem;
+}
+
+/* ── Motivo-assinatura: a linha de telha ─────────────────────────
+   Escalope derivado do telhado colonial. Duas formas:
+   .telha-edge  — recorte na borda superior de fotos (cor do fundo)
+   .telha-divider — fio de arcos terracota entre seções           */
+.telha-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.75rem;
+  background: radial-gradient(
+      circle at 0.5625rem 0,
+      rgb(var(--c-bg)) 0 0.46rem,
+      transparent 0.52rem
+    )
+    0 0 / 1.125rem 0.75rem repeat-x;
+}
+.telha-divider {
+  height: 0.8125rem;
+  background: radial-gradient(
+      circle at 0.5625rem 0.875rem,
+      transparent 0.4rem,
+      rgb(var(--c-terra)) 0.44rem 0.53rem,
+      transparent 0.58rem
+    )
+    0 0 / 1.125rem 0.8125rem repeat-x;
+}
+
+/* Scrollbar discreta nos dois temas */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--ink-900);
+  background: rgb(var(--c-bg));
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--ink-700);
+  background: rgb(var(--c-border));
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--wood-300);
+  background: rgb(var(--c-bronze));
 }
 
-/* Linha decorativa diagonal usada nas seções */
-.hairline {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(94, 234, 212, 0.45),
-    transparent
-  );
-  height: 1px;
-}
-
-/* Glow para destaques */
-.text-accent-glow {
-  color: var(--accent);
-  text-shadow: 0 0 24px rgba(94, 234, 212, 0.35);
-}
-
-/* Botão com brilho deslizante */
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shine::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.18) 50%,
-    transparent 70%
-  );
-  transform: translateX(-100%);
-  transition: transform 0.7s;
-}
-.btn-shine:hover::before {
-  transform: translateX(100%);
-}
-
-/* Grão sutil para dar textura aos backgrounds */
-.grain::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' /></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
-  opacity: 0.05;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
-
-/* Wood pattern decorativo */
-.wood-pattern {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(184, 133, 79, 0.03) 0,
-    rgba(184, 133, 79, 0.03) 1px,
-    transparent 1px,
-    transparent 6px
-  );
-}
-
-/* Calendario - células */
-.cal-cell {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cal-cell:hover:not(:disabled) {
-  transform: translateY(-2px);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
