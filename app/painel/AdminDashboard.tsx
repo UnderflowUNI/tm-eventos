@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Calendar,
   ChevronLeft,
@@ -20,6 +19,8 @@ import {
   Tag,
 } from "lucide-react";
 import { monthGrid, MES_NOMES, DIA_SEMANA_LONGO, ymd, isSameDay } from "@/lib/calendar-utils";
+import { PrefsControls } from "@/components/site/PrefsControls";
+import { Button } from "@/components/ui/Button";
 
 type BlockedDate = {
   id: string;
@@ -170,55 +171,51 @@ export default function AdminDashboard({ userName }: { userName: string }) {
       : "";
 
   return (
-    <div className="min-h-screen bg-ink-900 text-white">
-      <header className="border-b border-white/10 bg-ink-800">
+    <div className="min-h-screen">
+      <header className="border-b border-line bg-surface">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between flex-wrap gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0">
-              <Image
-                src="/brand/logo-tm.png"
-                alt="TM"
-                fill
-                className="object-contain drop-shadow-[0_0_12px_rgba(94,234,212,0.35)]"
-              />
+          <div>
+            <div className="font-display text-lg sm:text-xl">
+              TM <em className="italic font-normal text-muted">Painel da Dona</em>
             </div>
-            <div>
-              <div className="font-display text-lg sm:text-xl">Painel da Dona</div>
-              <div className="text-xs sm:text-sm text-white/50">Olá, {userName}!</div>
-            </div>
+            <div className="text-xs sm:text-sm text-muted">Olá, {userName}!</div>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border border-white/15 hover:border-white/40 rounded-md text-sm sm:text-base"
-          >
-            <LogOut size={16} /> Sair
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <PrefsControls className="hidden sm:flex" />
+            <Button variant="outline" onClick={logout}>
+              <LogOut size={16} /> Sair
+            </Button>
+          </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3" role="tablist" aria-label="Seções do painel">
           <button
+            role="tab"
+            aria-selected={tab === "calendar"}
             onClick={() => setTab("calendar")}
-            className={`flex items-center justify-center gap-2 sm:gap-3 py-3.5 sm:py-5 rounded-lg text-sm sm:text-lg font-bold transition ${
+            className={`flex items-center justify-center gap-2 sm:gap-3 py-3.5 sm:py-5 rounded text-sm sm:text-lg font-bold transition-colors duration-fast ${
               tab === "calendar"
-                ? "bg-accent text-ink-900"
-                : "bg-ink-800 text-white/70 hover:text-white border border-white/10"
+                ? "bg-accent text-accent-contrast"
+                : "bg-surface text-muted hover:text-ink border border-line"
             }`}
           >
             <Calendar size={18} /> Calendário
           </button>
           <button
+            role="tab"
+            aria-selected={tab === "bookings"}
             onClick={() => setTab("bookings")}
-            className={`flex items-center justify-center gap-2 sm:gap-3 py-3.5 sm:py-5 rounded-lg text-sm sm:text-lg font-bold transition relative ${
+            className={`flex items-center justify-center gap-2 sm:gap-3 py-3.5 sm:py-5 rounded text-sm sm:text-lg font-bold transition-colors duration-fast relative ${
               tab === "bookings"
-                ? "bg-accent text-ink-900"
-                : "bg-ink-800 text-white/70 hover:text-white border border-white/10"
+                ? "bg-accent text-accent-contrast"
+                : "bg-surface text-muted hover:text-ink border border-line"
             }`}
           >
             <Inbox size={18} /> Pedidos
             {bookings.filter((b) => b.status === "NEW").length > 0 && (
-              <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full">
+              <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-danger text-bg text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded-full">
                 {bookings.filter((b) => b.status === "NEW").length}
               </span>
             )}
@@ -226,52 +223,52 @@ export default function AdminDashboard({ userName }: { userName: string }) {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-32">
+      <main id="conteudo" className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-32">
         {tab === "calendar" && (
           <div>
-            <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 sm:p-5 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed">
+            <div className="bg-accent/10 border border-accent/30 rounded p-4 sm:p-5 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed">
               <strong className="text-accent">Como usar:</strong> Toque no{" "}
               <strong>1º dia</strong> do período e depois no{" "}
               <strong>último dia</strong> para selecionar o intervalo. Depois
-              aperte <strong>"Marcar"</strong> abaixo.
+              aperte <strong>&ldquo;Marcar&rdquo;</strong> abaixo.
             </div>
 
-            <div className="flex items-center justify-between mb-4 sm:mb-6 bg-ink-800 border border-white/10 rounded-lg p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 bg-surface border border-line rounded p-3 sm:p-4">
               <button
                 onClick={() => {
                   if (month === 0) { setMonth(11); setYear(year - 1); }
                   else setMonth(month - 1);
                 }}
-                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 hover:bg-ink-700 rounded-md text-sm sm:text-base"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] hover:bg-surface-2 rounded text-sm sm:text-base transition-colors duration-fast"
               >
                 <ChevronLeft size={18} />
                 <span className="hidden sm:inline">Mês anterior</span>
               </button>
-              <div className="text-center">
+              <div className="text-center" aria-live="polite">
                 <div className="font-display text-xl sm:text-3xl">{MES_NOMES[month]}</div>
-                <div className="text-xs sm:text-base text-white/50">{year}</div>
+                <div className="font-mono text-xs sm:text-sm text-muted">{year}</div>
               </div>
               <button
                 onClick={() => {
                   if (month === 11) { setMonth(0); setYear(year + 1); }
                   else setMonth(month + 1);
                 }}
-                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 hover:bg-ink-700 rounded-md text-sm sm:text-base"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] hover:bg-surface-2 rounded text-sm sm:text-base transition-colors duration-fast"
               >
                 <span className="hidden sm:inline">Próximo mês</span>
                 <ChevronRight size={18} />
               </button>
             </div>
 
-            <div className="bg-ink-800 border border-white/10 rounded-lg p-2 sm:p-4">
+            <div className="bg-surface border border-line rounded p-2 sm:p-4">
               <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-1 sm:mb-2">
                 {DIA_SEMANA_LONGO.map((d, i) => (
                   <div
                     key={d}
-                    className="text-center font-bold text-white/60 py-1.5 sm:py-2"
+                    className="text-center font-bold text-muted py-1.5 sm:py-2"
                   >
                     <span className="hidden sm:inline text-sm">{d}</span>
-                    <span className="sm:hidden text-[10px]">{["D","S","T","Q","Q","S","S"][i]}</span>
+                    <span className="sm:hidden text-[0.625rem]">{["D","S","T","Q","Q","S","S"][i]}</span>
                   </div>
                 ))}
               </div>
@@ -296,20 +293,20 @@ export default function AdminDashboard({ userName }: { userName: string }) {
                   const isInPreview = !!(pStart && pEnd && key >= pStart && key <= pEnd && inMonth && !isPast);
 
                   let cls =
-                    "relative aspect-square min-h-[36px] sm:min-h-[52px] lg:min-h-[64px] flex flex-col items-center justify-center text-sm sm:text-base lg:text-xl font-medium rounded-md transition cursor-pointer p-0.5 sm:p-1 ";
-                  if (!inMonth) cls += "text-white/15 cursor-default ";
-                  else if (isPast) cls += "text-white/25 cursor-default ";
+                    "relative aspect-square min-h-[36px] sm:min-h-[52px] lg:min-h-[64px] flex flex-col items-center justify-center text-sm sm:text-base lg:text-xl font-medium rounded transition-colors duration-fast cursor-pointer p-0.5 sm:p-1 ";
+                  if (!inMonth) cls += "text-ink/15 cursor-default ";
+                  else if (isPast) cls += "text-ink/25 cursor-default ";
                   else if (status === "OCCUPIED")
-                    cls += "bg-red-500/25 text-red-200 border-2 border-red-500 hover:bg-red-500/40 ";
+                    cls += "bg-danger/15 text-danger border-2 border-danger hover:bg-danger/25 ";
                   else if (status === "PENDING")
-                    cls += "bg-amber-500/25 text-amber-200 border-2 border-amber-500 hover:bg-amber-500/40 ";
+                    cls += "bg-warn/15 text-warn border-2 border-warn hover:bg-warn/25 ";
                   else
-                    cls += "bg-ink-700 text-white hover:bg-accent/30 hover:text-accent border-2 border-transparent ";
+                    cls += "bg-surface-2 text-ink hover:bg-accent/20 border-2 border-transparent ";
 
-                  if (isInPreview && !isSelected) cls += "bg-accent/20 text-accent border-2 border-accent/40 ";
-                  if (isToday) cls += "ring-2 ring-accent ring-offset-1 sm:ring-offset-2 ring-offset-ink-800 ";
-                  if (isSelected) cls += "outline outline-2 sm:outline-3 outline-accent scale-[0.96] ";
-                  if (isAnchor) cls += "bg-accent/30 ";
+                  if (isInPreview && !isSelected) cls += "bg-accent/15 text-accent border-2 border-accent/40 ";
+                  if (isToday) cls += "ring-2 ring-accent ring-offset-1 sm:ring-offset-2 ring-offset-surface ";
+                  if (isSelected) cls += "outline outline-2 outline-accent scale-[0.96] ";
+                  if (isAnchor) cls += "bg-accent/25 ";
 
                   return (
                     <button
@@ -321,9 +318,9 @@ export default function AdminDashboard({ userName }: { userName: string }) {
                       className={cls}
                       title={row?.label || ""}
                     >
-                      <span>{d.getDate()}</span>
+                      <span>{inMonth ? d.getDate() : ""}</span>
                       {row?.label && (
-                        <span className="hidden sm:block text-[8px] sm:text-[9px] leading-tight font-normal opacity-80 line-clamp-1 max-w-full px-0.5 sm:px-1">
+                        <span className="hidden sm:block text-[0.5rem] sm:text-[0.5625rem] leading-tight font-normal opacity-80 line-clamp-1 max-w-full px-0.5 sm:px-1">
                           {row.label}
                         </span>
                       )}
@@ -336,16 +333,16 @@ export default function AdminDashboard({ userName }: { userName: string }) {
               </div>
 
               {rangeAnchor && (
-                <div className="mt-3 text-sm text-center text-accent animate-pulse">
+                <div className="mt-3 text-sm text-center text-accent" aria-live="polite">
                   Agora clique no último dia do período
                 </div>
               )}
 
-              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/10 flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-base">
-                <Legend color="bg-ink-700 border-white/20" label="Livre" />
-                <Legend color="bg-amber-500/40 border-amber-500" label="Em análise" />
-                <Legend color="bg-red-500/40 border-red-500" label="Ocupado" />
-                <Legend color="bg-ink-700 border-accent outline outline-2 outline-accent" label="Selecionado" />
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-base">
+                <Legend color="bg-surface-2 border-line" label="Livre" />
+                <Legend color="bg-warn/30 border-warn" label="Em análise" />
+                <Legend color="bg-danger/30 border-danger" label="Ocupado" />
+                <Legend color="bg-surface-2 border-accent outline outline-2 outline-accent" label="Selecionado" />
               </div>
             </div>
           </div>
@@ -354,8 +351,8 @@ export default function AdminDashboard({ userName }: { userName: string }) {
         {tab === "bookings" && (
           <div className="space-y-4">
             {bookings.length === 0 && (
-              <div className="text-center py-20 text-white/40">
-                <Inbox size={48} className="mx-auto mb-4 opacity-30" />
+              <div className="text-center py-20 text-muted">
+                <Inbox size={48} className="mx-auto mb-4 opacity-40" />
                 <p className="text-lg">Nenhum pedido recebido ainda.</p>
               </div>
             )}
@@ -372,34 +369,28 @@ export default function AdminDashboard({ userName }: { userName: string }) {
 
       {/* Barra de ação fixa quando há datas selecionadas */}
       {tab === "calendar" && selected.size > 0 && (
-        <div className="fixed bottom-0 inset-x-0 bg-ink-800 border-t-2 border-accent z-40 shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
+        <div className="fixed bottom-0 inset-x-0 bg-surface border-t-2 border-accent z-40">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-wrap gap-2 sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent text-ink-900 rounded-md grid place-items-center font-bold text-lg sm:text-xl">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent text-accent-contrast rounded grid place-items-center font-bold text-lg sm:text-xl tabular-nums">
                 {selected.size}
               </div>
               <div>
                 <div className="font-bold text-base sm:text-lg">
                   {selected.size === 1 ? "dia selecionado" : "dias selecionados"}
                 </div>
-                <div className="text-xs sm:text-sm text-white/60">
+                <div className="text-xs sm:text-sm text-muted font-mono">
                   {summarizeSelection(Array.from(selected).sort())}
                 </div>
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={clearSelection}
-                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 border border-white/20 hover:border-white/40 rounded-md text-sm sm:text-base"
-              >
+              <Button variant="outline" onClick={clearSelection}>
                 <X size={16} /> Limpar
-              </button>
-              <button
-                onClick={() => setModalOpen(true)}
-                className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow text-sm sm:text-base"
-              >
+              </Button>
+              <Button onClick={() => setModalOpen(true)}>
                 <Tag size={16} /> Marcar
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -434,7 +425,7 @@ function formatDayBR(yyyymmdd: string) {
 function Legend({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className={`w-5 h-5 rounded border-2 ${color}`} />
+      <div className={`w-5 h-5 rounded border-2 ${color}`} aria-hidden="true" />
       <span>{label}</span>
     </div>
   );
@@ -459,59 +450,71 @@ function BulkBlockModal({
 }) {
   const [label, setLabel] = useState(initialLabel);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-black/70 grid place-items-center z-50 p-4 sm:p-6 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Marcar datas"
+      className="fixed inset-0 bg-black/60 grid place-items-center z-50 p-4 sm:p-6 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-ink-800 border border-white/15 rounded-xl p-5 sm:p-8 max-w-md w-full"
+        className="bg-surface border border-line rounded p-5 sm:p-8 max-w-md w-full"
       >
-        <div className="text-sm text-accent uppercase tracking-[0.2em] mb-2">
+        <div className="font-mono text-[0.6875rem] font-medium text-bronze uppercase tracking-[0.2em] mb-2">
           Marcar datas
         </div>
         <h2 className="font-display text-2xl mb-1">
           {count} {count === 1 ? "dia" : "dias"}
         </h2>
-        <div className="text-base text-white/60 mb-6">{summary}</div>
+        <div className="text-base text-muted mb-6 font-mono">{summary}</div>
 
-        <label className="block text-sm font-bold mb-2 text-white/80">
+        <label htmlFor="nome-evento" className="block text-sm font-bold mb-2 text-ink/85">
           Nome do evento (opcional)
         </label>
         <input
+          id="nome-evento"
           type="text"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Ex: Casamento João e Maria"
           autoFocus
-          className="w-full px-4 py-3 mb-6 bg-ink-900 border border-white/10 focus:border-accent rounded-md text-base outline-none"
+          className="w-full min-h-[2.75rem] px-4 py-3 mb-6 bg-bg border border-line focus:border-accent rounded text-base outline-none transition-colors duration-fast"
         />
 
         <div className="space-y-2 sm:space-y-3">
           <button
             onClick={() => onBlock("OCCUPIED", label)}
-            className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 bg-red-500/20 hover:bg-red-500/30 border-2 border-red-500 text-red-200 rounded-lg text-base sm:text-lg font-bold transition"
+            className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 min-h-[2.75rem] bg-danger/10 hover:bg-danger/20 border-2 border-danger text-danger rounded text-base sm:text-lg font-bold transition-colors duration-fast"
           >
             <XCircle size={20} /> Marcar como Ocupado
           </button>
           <button
             onClick={() => onBlock("PENDING", label)}
-            className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 bg-amber-500/20 hover:bg-amber-500/30 border-2 border-amber-500 text-amber-200 rounded-lg text-base sm:text-lg font-bold transition"
+            className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 min-h-[2.75rem] bg-warn/10 hover:bg-warn/20 border-2 border-warn text-warn rounded text-base sm:text-lg font-bold transition-colors duration-fast"
           >
             <Clock size={20} /> Marcar como Em Análise
           </button>
           {someBlocked && (
             <button
               onClick={onUnblock}
-              className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 bg-accent/20 hover:bg-accent/30 border-2 border-accent text-accent rounded-lg text-base sm:text-lg font-bold transition"
+              className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 min-h-[2.75rem] bg-accent/10 hover:bg-accent/20 border-2 border-accent text-accent rounded text-base sm:text-lg font-bold transition-colors duration-fast"
             >
               <CheckCircle2 size={20} /> Liberar todas
             </button>
           )}
           <button
             onClick={onClose}
-            className="w-full py-2.5 sm:py-3 text-white/50 hover:text-white text-sm sm:text-base"
+            className="w-full py-2.5 sm:py-3 min-h-[2.75rem] text-muted hover:text-ink text-sm sm:text-base transition-colors duration-fast"
           >
             Cancelar
           </button>
@@ -543,10 +546,10 @@ function BookingCard({
 
   const statusBadge =
     {
-      NEW: "bg-accent/20 border-accent text-accent",
-      CONTACTED: "bg-blue-500/20 border-blue-500 text-blue-300",
-      CONFIRMED: "bg-green-500/20 border-green-500 text-green-300",
-      REJECTED: "bg-red-500/20 border-red-500 text-red-300",
+      NEW: "bg-accent/15 border-accent text-accent",
+      CONTACTED: "bg-terra/15 border-terra text-terra",
+      CONFIRMED: "bg-success/15 border-success text-success",
+      REJECTED: "bg-danger/15 border-danger text-danger",
     }[booking.status] || "";
 
   const statusLabel =
@@ -558,22 +561,22 @@ function BookingCard({
     }[booking.status] || booking.status;
 
   return (
-    <div className="bg-ink-800 border border-white/10 rounded-lg p-4 sm:p-6">
+    <div className="bg-surface border border-line rounded p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span
-              className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${
+              className={`px-2 py-0.5 font-mono text-[0.625rem] font-medium uppercase tracking-wider rounded border ${
                 isTable
-                  ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
-                  : "bg-accent/20 text-accent border border-accent/40"
+                  ? "bg-terra/10 text-terra border-terra/40"
+                  : "bg-accent/10 text-accent border-accent/40"
               }`}
             >
               {isTable ? "🎣 Mesa" : "🎉 Salão"}
             </span>
           </div>
           <div className="font-display text-xl sm:text-2xl">{booking.clientName}</div>
-          <div className="text-xs sm:text-sm text-white/50 mt-1">
+          <div className="text-xs sm:text-sm text-muted mt-1">
             Recebido em{" "}
             {new Date(booking.createdAt).toLocaleDateString("pt-BR", {
               day: "2-digit",
@@ -584,7 +587,7 @@ function BookingCard({
           </div>
         </div>
         <div
-          className={`px-2 sm:px-3 py-1 border rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider ${statusBadge}`}
+          className={`px-2 sm:px-3 py-1 border rounded-full font-mono text-[0.625rem] sm:text-xs font-medium uppercase tracking-wider ${statusBadge}`}
         >
           {statusLabel}
         </div>
@@ -600,22 +603,22 @@ function BookingCard({
       </div>
 
       {!isTable && (
-        <div className="mb-4 p-4 bg-ink-900 rounded-md">
-          <div className="text-xs uppercase tracking-[0.2em] text-accent mb-2">
+        <div className="mb-4 p-4 bg-bg border border-line rounded">
+          <div className="font-mono text-[0.625rem] font-medium uppercase tracking-[0.2em] text-bronze mb-2">
             Evento e itens
           </div>
           <div className="text-base mb-2">{booking.eventType}</div>
-          <div className="text-sm text-white/70">
+          <div className="text-sm text-muted">
             {booking.selections.length} itens — Total estimado:{" "}
-            <span className="text-accent font-bold">
+            <span className="text-accent font-bold tabular-nums">
               R$ {booking.totalEstimate.toFixed(2).replace(".", ",")}
             </span>
           </div>
         </div>
       )}
       {booking.message && (
-        <div className="mb-4 p-4 bg-ink-900 rounded-md text-sm text-white/70 italic">
-          "{booking.message}"
+        <div className="mb-4 p-4 bg-bg border border-line rounded text-sm text-muted italic">
+          &ldquo;{booking.message}&rdquo;
         </div>
       )}
 
@@ -624,14 +627,14 @@ function BookingCard({
           href={`https://wa.me/${booking.whatsapp.replace(/\D/g, "")}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-accent text-ink-900 font-bold rounded-md hover:bg-accent-glow text-sm sm:text-base"
+          className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] bg-accent text-accent-contrast font-bold rounded hover:opacity-90 text-sm sm:text-base transition-opacity duration-fast"
         >
           <MessageCircle size={16} /> WhatsApp
         </a>
         {booking.status === "NEW" && (
           <button
             onClick={() => onUpdate("CONTACTED")}
-            className="px-3 sm:px-5 py-2.5 sm:py-3 bg-blue-500/20 border border-blue-500 text-blue-300 rounded-md text-sm sm:text-base font-bold hover:bg-blue-500/30"
+            className="px-3 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] bg-terra/10 border border-terra text-terra rounded text-sm sm:text-base font-bold hover:bg-terra/20 transition-colors duration-fast"
           >
             Contatado
           </button>
@@ -639,7 +642,7 @@ function BookingCard({
         {booking.status !== "CONFIRMED" && (
           <button
             onClick={() => onUpdate("CONFIRMED")}
-            className="px-3 sm:px-5 py-2.5 sm:py-3 bg-green-500/20 border border-green-500 text-green-300 rounded-md text-sm sm:text-base font-bold hover:bg-green-500/30"
+            className="px-3 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] bg-success/10 border border-success text-success rounded text-sm sm:text-base font-bold hover:bg-success/20 transition-colors duration-fast"
           >
             Confirmar
           </button>
@@ -647,7 +650,7 @@ function BookingCard({
         {booking.status !== "REJECTED" && (
           <button
             onClick={() => onUpdate("REJECTED")}
-            className="px-3 sm:px-5 py-2.5 sm:py-3 bg-red-500/20 border border-red-500 text-red-300 rounded-md text-sm sm:text-base font-bold hover:bg-red-500/30"
+            className="px-3 sm:px-5 py-2.5 sm:py-3 min-h-[2.75rem] bg-danger/10 border border-danger text-danger rounded text-sm sm:text-base font-bold hover:bg-danger/20 transition-colors duration-fast"
           >
             Recusar
           </button>
@@ -670,7 +673,7 @@ function Info({
     <div className="flex items-start gap-3">
       <span className="text-accent mt-0.5">{icon}</span>
       <div>
-        <div className="text-xs text-white/50 uppercase tracking-wider">{label}</div>
+        <div className="font-mono text-[0.625rem] text-muted uppercase tracking-wider">{label}</div>
         <div className="text-base">{value}</div>
       </div>
     </div>

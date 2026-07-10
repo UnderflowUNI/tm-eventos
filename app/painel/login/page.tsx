@@ -4,6 +4,10 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { LogIn, AlertCircle, Eye, EyeOff, Clock } from "lucide-react";
+import { PrefsControls } from "@/components/site/PrefsControls";
+
+const INPUT_CLS =
+  "w-full min-h-[2.75rem] bg-bg border border-line rounded px-4 py-3.5 sm:py-4 text-base sm:text-lg text-ink focus:border-accent focus:outline-none transition-colors duration-fast";
 
 function LoginForm() {
   const router = useRouter();
@@ -47,7 +51,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-900 grid place-items-center px-4 sm:px-6 wood-pattern">
+    <main id="conteudo" className="min-h-screen grid place-items-center px-4 sm:px-6 py-10">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="relative w-20 h-20 mx-auto mb-4">
@@ -55,17 +59,18 @@ function LoginForm() {
               src="/brand/logo-tm.png"
               alt="TM"
               fill
-              className="object-contain drop-shadow-[0_0_18px_rgba(94,234,212,0.4)]"
+              sizes="80px"
+              className="object-contain"
             />
           </div>
           <h1 className="font-display text-3xl">Painel Administrativo</h1>
-          <p className="text-white/50 text-sm mt-2">
+          <p className="text-muted text-sm mt-2">
             Acesso restrito à proprietária
           </p>
         </div>
 
         {timedOut && (
-          <div className="flex items-center gap-3 text-amber-400 text-sm bg-amber-500/10 border border-amber-500/30 rounded-md p-4 mb-5">
+          <div className="flex items-center gap-3 text-warn text-sm bg-warn/10 border border-warn/40 rounded p-4 mb-5">
             <Clock size={16} className="shrink-0" />
             Sessão encerrada por inatividade. Faça login novamente.
           </div>
@@ -73,43 +78,44 @@ function LoginForm() {
 
         <form
           onSubmit={submit}
-          className="bg-ink-800/60 border border-white/10 rounded-lg p-6 sm:p-8 space-y-5"
+          className="bg-surface border border-line rounded p-6 sm:p-8 space-y-5"
           noValidate
         >
           <div>
-            <label className="block text-sm sm:text-base mb-2 text-white/80">
+            <label htmlFor="login-email" className="block text-sm sm:text-base mb-2 text-ink/85">
               E-mail
             </label>
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
               inputMode="email"
-              className="w-full bg-ink-900 border border-white/10 rounded-md px-4 py-3.5 sm:py-4 text-base sm:text-lg focus:border-accent focus:outline-none"
+              className={INPUT_CLS}
             />
           </div>
 
           <div>
-            <label className="block text-sm sm:text-base mb-2 text-white/80">
+            <label htmlFor="login-senha" className="block text-sm sm:text-base mb-2 text-ink/85">
               Senha
             </label>
             <div className="relative">
               <input
+                id="login-senha"
                 type={showPass ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="w-full bg-ink-900 border border-white/10 rounded-md px-4 py-3.5 sm:py-4 pr-12 text-base sm:text-lg focus:border-accent focus:outline-none"
+                className={`${INPUT_CLS} pr-12`}
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-accent transition p-1"
+                className="absolute right-1 top-1/2 -translate-y-1/2 min-w-[2.75rem] min-h-[2.75rem] grid place-items-center text-muted hover:text-accent transition-colors duration-fast"
                 aria-label={showPass ? "Ocultar senha" : "Ver senha"}
-                tabIndex={-1}
               >
                 {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -117,7 +123,7 @@ function LoginForm() {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-md p-3">
+            <div className="flex items-center gap-2 text-danger text-sm bg-danger/10 border border-danger/40 rounded p-3" role="alert">
               <AlertCircle size={16} className="shrink-0" /> {error}
             </div>
           )}
@@ -125,14 +131,18 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-shine w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-accent text-ink-900 font-bold text-base sm:text-lg rounded-md hover:bg-accent-glow disabled:opacity-50 transition"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 min-h-[3rem] bg-accent text-accent-contrast font-bold text-base sm:text-lg rounded hover:opacity-90 disabled:opacity-50 transition-opacity duration-fast"
           >
             <LogIn size={18} />
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+
+        <div className="mt-6 flex justify-center">
+          <PrefsControls />
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 

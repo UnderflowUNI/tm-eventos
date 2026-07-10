@@ -78,32 +78,37 @@ export function InactivityGuard({ children }: { children: React.ReactNode }) {
       {children}
 
       {showWarning && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-ink-800 border border-accent/30 rounded-xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-7 h-7 text-amber-400">
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Sessão prestes a expirar"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        >
+          <div className="bg-surface border border-line rounded p-8 max-w-sm w-full mx-4 text-center">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-warn/10 border border-warn/40 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-7 h-7 text-warn" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
             </div>
             <h2 className="font-display text-xl mb-2">Sessão prestes a expirar</h2>
-            <p className="text-white/60 text-sm mb-1">
+            <p className="text-muted text-sm mb-1">
               Você ficou inativo por 25 minutos.
             </p>
-            <p className="text-white/60 text-sm mb-6">
+            <p className="text-muted text-sm mb-6">
               Saindo automaticamente em{" "}
-              <span className="text-amber-400 font-bold tabular-nums">{countdown}</span>
+              <span className="text-warn font-bold tabular-nums">{countdown}</span>
             </p>
             <div className="flex gap-3">
               <button
                 onClick={doLogout}
-                className="flex-1 py-2.5 border border-white/15 rounded-md text-sm hover:border-white/40 transition"
+                className="flex-1 py-2.5 min-h-[2.75rem] border border-line rounded text-sm hover:border-accent hover:text-accent transition-colors duration-fast"
               >
                 Sair agora
               </button>
               <button
                 onClick={stayIn}
-                className="flex-1 py-2.5 bg-accent text-ink-900 font-bold rounded-md text-sm hover:bg-accent-glow transition"
+                className="flex-1 py-2.5 min-h-[2.75rem] bg-accent text-accent-contrast font-bold rounded text-sm hover:opacity-90 transition-opacity duration-fast"
               >
                 Continuar
               </button>
